@@ -5,14 +5,8 @@ use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TextTemplateResolver;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Class
- */
-class BufferTranslationTest extends TestCase
+class TextTemplatesTest extends TestCase
 {
-    const ORIGINAL_LANGUAGE = 'en';
-    const CURRENT_LANGUAGE = 'ua';
-
     public function test()
     {
         $textTemplateFactory = new TextTemplateFactory();
@@ -53,10 +47,10 @@ class BufferTranslationTest extends TestCase
 
             $this->assertEquals('Zero', $textTemplatesResolver->resolve($textTemplate));
 
-            $numberTextTemplate->setContentString(1);
+            $numberTextTemplate->setTemplate(1);
             $this->assertEquals('One', $textTemplatesResolver->resolve($textTemplate));
 
-            $numberTextTemplate->setContentString(50);
+            $numberTextTemplate->setTemplate(50);
             $this->assertEquals('Unknown 50', $textTemplatesResolver->resolve($textTemplate));
         }
 
@@ -79,7 +73,7 @@ class BufferTranslationTest extends TestCase
                 ->getChildTextTemplatesCollection()
                 ->getBufferContent('appleNumbers')
             ;
-            $numberTextTemplate->setContentString(0);
+            $numberTextTemplate->setTemplate(0);
 
             $this->assertEquals("Tom has no one apple", $textTemplatesResolver->resolve($textTemplate));
         }
@@ -90,6 +84,14 @@ class BufferTranslationTest extends TestCase
                 'b' => 1,
             ]);
             self::assertEquals('11', $textTemplatesResolver->resolve($textTemplate));
+        }
+
+        { // Check re-adding the key as a template
+            $textTemplate = $textTemplateFactory->create('Hello {user_name}', ['user_name' => 'Tom']);
+            $childTextTemplatesCollection = $textTemplate->getChildTextTemplatesCollection();
+            $userNameKey = $childTextTemplatesCollection->generateKey('user_name');
+            $newUserNameKey = $childTextTemplatesCollection->add(new ALI\TextTemplate\TextTemplateItem($userNameKey));
+            self::assertEquals($newUserNameKey, $userNameKey);
         }
     }
 }

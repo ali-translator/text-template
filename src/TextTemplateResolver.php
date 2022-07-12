@@ -20,7 +20,7 @@ class TextTemplateResolver
         TextTemplateItem $textTemplate
     ): string
     {
-        $contentString = $textTemplate->getContentString();
+        $contentString = $textTemplate->getTemplate();
 
         $childContentCollection = $textTemplate->getChildTextTemplatesCollection();
         if (!$childContentCollection) {

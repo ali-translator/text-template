@@ -6,27 +6,36 @@ use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 
 class TextTemplateItem
 {
-    protected string $content;
+    protected string $template;
 
     protected ?TextTemplatesCollection $childTextTemplatesCollection = null;
 
     private string $messageFormat;
 
-    public function __construct(string $content, TextTemplatesCollection $childTextTemplatesCollection = null, ?string $messageFormat = null)
+    // If you need custom notes on TextTemplateItem, you can use this property
+    private array $customNotes;
+
+    public function __construct(
+        string                  $template,
+        TextTemplatesCollection $childTextTemplatesCollection = null,
+        ?string                 $messageFormat = null,
+        array                   $customNotes = []
+    )
     {
-        $this->content = $content;
+        $this->template = $template;
         $this->childTextTemplatesCollection = $childTextTemplatesCollection;
         $this->messageFormat = $messageFormat ?: MessageFormatsEnum::TEXT_TEMPLATE;
+        $this->customNotes = $customNotes;
     }
 
-    public function getContentString(): string
+    public function getTemplate(): string
     {
-        return $this->content;
+        return $this->template;
     }
 
-    public function setContentString(string $content)
+    public function setTemplate(string $content)
     {
-        $this->content = $content;
+        $this->template = $content;
     }
 
     public function getChildTextTemplatesCollection(): ?TextTemplatesCollection
@@ -39,9 +48,19 @@ class TextTemplateItem
         $this->childTextTemplatesCollection = $childTextTemplatesCollection;
     }
 
+    public function getCustomNotes(): array
+    {
+        return $this->customNotes;
+    }
+
+    public function setCustomNotes(array $customNotes): void
+    {
+        $this->customNotes = $customNotes;
+    }
+
     public function getIdHash(): string
     {
-        return $this->messageFormat . '#' . $this->content;
+        return $this->messageFormat . '#' . $this->template;
     }
 
     public function getMessageFormat(): string
