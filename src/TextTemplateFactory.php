@@ -14,7 +14,7 @@ class TextTemplateFactory
         $this->keyGenerator = $keyGenerator ?: new StaticKeyGenerator('{', '}');
     }
 
-    public function create(string $content, array $parameters = [], string $childMessageFormat = null): TextTemplateItem
+    public function create(string $content, array $parameters = [], string $messageFormat = null): TextTemplateItem
     {
         $textTemplatesCollection = null;
         if ($parameters) {
@@ -36,6 +36,6 @@ class TextTemplateFactory
             }
         }
 
-        return new TextTemplateItem($content, $textTemplatesCollection, $childMessageFormat);
+        return new TextTemplateItem($content, $textTemplatesCollection, $messageFormat);
     }
 }
