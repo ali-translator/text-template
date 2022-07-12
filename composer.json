@@ -1,0 +1,39 @@
+{
+    "name": "ali-translator/text-template",
+    "description": "Text templates",
+    "keywords": [
+        "sli", "ali", "text templates"
+    ],
+    "homepage": "https://sli.su/",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Slayer911",
+            "email": "garolds911@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/ali-translator/text-template/issues?state=open",
+        "source": "https://github.com/ali-translator/text-template"
+    },
+    "require": {
+        "php": "^7.4",
+        "ext-intl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ALI\\TextTemplate\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ALI\\TextTemplate\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.0",
+        "php": "^7.4",
+        "phpunit/phpunit": "^9.0"
+    }
+}
