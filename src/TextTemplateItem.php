@@ -6,14 +6,14 @@ use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 
 class TextTemplateItem
 {
-    protected string $template;
+    protected string $content;
 
     protected ?TextTemplatesCollection $childTextTemplatesCollection = null;
 
     private string $messageFormat;
 
     // If you need custom notes on TextTemplateItem, you can use this property
-    private array $customNotes;
+    private array $customNotes = [];
 
     public function __construct(
         string                  $template,
@@ -22,20 +22,20 @@ class TextTemplateItem
         array                   $customNotes = []
     )
     {
-        $this->template = $template;
+        $this->content = $template;
         $this->childTextTemplatesCollection = $childTextTemplatesCollection;
         $this->messageFormat = $messageFormat ?: MessageFormatsEnum::TEXT_TEMPLATE;
         $this->customNotes = $customNotes;
     }
 
-    public function getTemplate(): string
+    public function getContent(): string
     {
-        return $this->template;
+        return $this->content;
     }
 
-    public function setTemplate(string $content)
+    public function setContent(string $content)
     {
-        $this->template = $content;
+        $this->content = $content;
     }
 
     public function getChildTextTemplatesCollection(): ?TextTemplatesCollection
@@ -58,9 +58,32 @@ class TextTemplateItem
         $this->customNotes = $customNotes;
     }
 
+    private string $_idHash;
+
     public function getIdHash(): string
     {
-        return $this->messageFormat . '#' . $this->template;
+        if (!isset($this->_idHash)) {
+            $this->_idHash = $this->messageFormat . '#' . $this->content;
+            foreach ($this->customNotes as $key => $value) {
+                $this->_idHash .= '#' . $key . ':';
+                switch (true) {
+                    case is_bool($value):
+                        $this->_idHash .= (int)$value;
+                        break;
+                    case is_string($value):
+                        $this->_idHash .= $value;
+                        break;
+                    case is_object($value):
+                        $this->_idHash .= spl_object_hash($value);
+                        break;
+                    default:
+                        $this->_idHash .= serialize($value);
+                        break;
+                }
+            }
+        }
+
+        return $this->_idHash;
     }
 
     public function getMessageFormat(): string

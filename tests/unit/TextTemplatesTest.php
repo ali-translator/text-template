@@ -47,10 +47,10 @@ class TextTemplatesTest extends TestCase
 
             $this->assertEquals('Zero', $textTemplatesResolver->resolve($textTemplate));
 
-            $numberTextTemplate->setTemplate(1);
+            $numberTextTemplate->setContent(1);
             $this->assertEquals('One', $textTemplatesResolver->resolve($textTemplate));
 
-            $numberTextTemplate->setTemplate(50);
+            $numberTextTemplate->setContent(50);
             $this->assertEquals('Unknown 50', $textTemplatesResolver->resolve($textTemplate));
         }
 
@@ -73,7 +73,7 @@ class TextTemplatesTest extends TestCase
                 ->getChildTextTemplatesCollection()
                 ->getBufferContent('appleNumbers')
             ;
-            $numberTextTemplate->setTemplate(0);
+            $numberTextTemplate->setContent(0);
 
             $this->assertEquals("Tom has no one apple", $textTemplatesResolver->resolve($textTemplate));
         }

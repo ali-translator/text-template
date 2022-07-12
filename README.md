@@ -21,6 +21,8 @@ $textTemplate = $textTemplateFactory->create('Tom has {appleNumbers}', [
             'appleNumbers' => 1,
         ],
         'format' => MessageFormatsEnum::MESSAGE_FORMATTER,
+        // Custom values if you need it
+        'options' => ['some_notes' => 123]
     ],
 ], MessageFormatsEnum::TEXT_TEMPLATE);
 

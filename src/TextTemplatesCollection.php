@@ -41,9 +41,9 @@ class TextTemplatesCollection implements IteratorAggregate
         ?string          $templateId = null
     ): string
     {
-        if (isset($this->existBufferKeys[$textTemplate->getTemplate()])) {
+        if (isset($this->existBufferKeys[$textTemplate->getContent()])) {
             // Prevent adding the same key few times
-            return $textTemplate->getTemplate();
+            return $textTemplate->getContent();
         }
 
         $isSimpleText = !$textTemplate->getChildTextTemplatesCollection();

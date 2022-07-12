@@ -27,6 +27,9 @@ class TextTemplateFactory
                     $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
                     $childMessageFormat = $childData['format'] ?? null;
                     $textTemplateItem = $this->create($childContentSting, $childParameters, $childMessageFormat);
+                    if (isset($childData['options'])) {
+                        $textTemplateItem->setCustomNotes($childData['options']);
+                    }
                 }
 
                 $textTemplatesCollection->add($textTemplateItem, $childContentId);
