@@ -21,7 +21,11 @@ class TextTemplateFactory
             $textTemplatesCollection = new TextTemplatesCollection($this->keyGenerator);
             foreach ($parameters as $childContentId => $childData) {
                 if (!is_array($childData)) {
-                    $textTemplateItem = $this->create((string)$childData);
+                    if ($childData instanceof TextTemplateItem) {
+                        $textTemplateItem = $childData;
+                    } else {
+                        $textTemplateItem = $this->create((string)$childData);
+                    }
                 } else {
                     $childContentSting = $childData['content'];
                     $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];

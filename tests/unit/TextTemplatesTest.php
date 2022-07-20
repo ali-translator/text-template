@@ -2,6 +2,7 @@
 
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplateResolver;
 use PHPUnit\Framework\TestCase;
 
@@ -76,6 +77,13 @@ class TextTemplatesTest extends TestCase
             $numberTextTemplate->setContent(0);
 
             $this->assertEquals("Tom has no one apple", $textTemplatesResolver->resolve($textTemplate));
+        }
+
+        { // Use object of TextTemplateItem in Factory
+            $textTemplate = $textTemplateFactory->create('Tom has {object_name}', [
+                'object_name' => new TextTemplateItem('a pen'),
+            ]);
+            self::assertEquals('Tom has a pen', $textTemplatesResolver->resolve($textTemplate));
         }
 
         { // Resolve two parameters with the same value
