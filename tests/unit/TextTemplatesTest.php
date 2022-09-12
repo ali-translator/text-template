@@ -1,5 +1,7 @@
 <?php
 
+namespace ALI\TextTemplate\Tests;
+
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TextTemplateItem;
@@ -44,7 +46,7 @@ class TextTemplatesTest extends TestCase
             $textTemplate = $textTemplateFactory->create('{number, plural, =0{Zero}=1{One}other{Unknown #}}', [
                 'number' => 0,
             ], MessageFormatsEnum::MESSAGE_FORMATTER);
-            $numberTextTemplate = $textTemplate->getChildTextTemplatesCollection()->getBufferContent('number');
+            $numberTextTemplate = $textTemplate->getChildTextTemplatesCollection()->get('number');
 
             $this->assertEquals('Zero', $textTemplatesResolver->resolve($textTemplate));
 
@@ -70,9 +72,9 @@ class TextTemplatesTest extends TestCase
 
             $numberTextTemplate = $textTemplate
                 ->getChildTextTemplatesCollection()
-                ->getBufferContent('appleNumbers')
+                ->get('appleNumbers')
                 ->getChildTextTemplatesCollection()
-                ->getBufferContent('appleNumbers')
+                ->get('appleNumbers')
             ;
             $numberTextTemplate->setContent(0);
 
@@ -98,7 +100,7 @@ class TextTemplatesTest extends TestCase
             $textTemplate = $textTemplateFactory->create('Hello {user_name}', ['user_name' => 'Tom']);
             $childTextTemplatesCollection = $textTemplate->getChildTextTemplatesCollection();
             $userNameKey = $childTextTemplatesCollection->generateKey('user_name');
-            $newUserNameKey = $childTextTemplatesCollection->add(new ALI\TextTemplate\TextTemplateItem($userNameKey));
+            $newUserNameKey = $childTextTemplatesCollection->add(new TextTemplateItem($userNameKey));
             self::assertEquals($newUserNameKey, $userNameKey);
         }
     }

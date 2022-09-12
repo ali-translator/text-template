@@ -6,5 +6,5 @@ interface KeyGenerator
 {
     public function generateKey(string $contentId): string;
 
-    public function getRegularExpression(): string;
+    public function getRegularExpression($regDelimiter = '/'): string;
 }

@@ -19,11 +19,9 @@ class StaticKeyGenerator implements KeyGenerator
         return $this->keyPrefix . $contentId . $this->keyPostfix;
     }
 
-    public function getRegularExpression(): string
+    public function getRegularExpression($regDelimiter = '/'): string
     {
-        $regDelimiter = '/';
-
-        return '/' . preg_quote($this->keyPrefix, $regDelimiter) . '(?P<id>[-_a-zA-Z0-9]+?)' . preg_quote($this->keyPostfix, $regDelimiter) . '/';
+        return $regDelimiter . preg_quote($this->keyPrefix, $regDelimiter) . '(?P<id>[-_a-zA-Z0-9]+?)' . preg_quote($this->keyPostfix, $regDelimiter) . $regDelimiter;
     }
 
     public function getKeyPrefix(): string

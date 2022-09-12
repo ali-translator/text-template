@@ -67,17 +67,9 @@ class TextTemplatesCollection implements IteratorAggregate
         return $bufferKey;
     }
 
-    public function getBufferContent(string $templateId): ?TextTemplateItem
+    public function get(string $templateId): ?TextTemplateItem
     {
         return !empty($this->textTemplates[$templateId]) ? $this->textTemplates[$templateId] : null;
-    }
-
-    /**
-     * @return TextTemplateItem[]
-     */
-    public function getArray(): array
-    {
-        return $this->textTemplates;
     }
 
     public function remove(string $templateId)
@@ -87,6 +79,14 @@ class TextTemplatesCollection implements IteratorAggregate
             unset($this->textTemplates[$templateId]);
             unset($this->indexedSimplyTexts[$buffersContent->getIdHash()]);
         }
+    }
+
+    /**
+     * @return TextTemplateItem[]
+     */
+    public function getArray(): array
+    {
+        return $this->textTemplates;
     }
 
     public function clear(): void
