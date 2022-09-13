@@ -2,29 +2,27 @@
 
 namespace ALI\TextTemplate\Tests;
 
+use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TextTemplateItem;
-use ALI\TextTemplate\TextTemplateResolver;
 use PHPUnit\Framework\TestCase;
 
 class TextTemplatesTest extends TestCase
 {
     public function test()
     {
-        $textTemplateFactory = new TextTemplateFactory();
-
-        $textTemplatesResolver = new TextTemplateResolver('en');
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
 
         $textTemplate = $textTemplateFactory->create('Hello {user_name}',[
             'user_name' => 'Tom'
         ]);
-        $this->assertEquals('Hello Tom', $textTemplatesResolver->resolve($textTemplate));
+        $this->assertEquals('Hello Tom', $textTemplate->resolve());
 
         $textTemplate = $textTemplateFactory->create('Hello {user_name} {user_name}',[
             'user_name' => 'Tom'
         ]);
-        $this->assertEquals('Hello Tom Tom', $textTemplatesResolver->resolve($textTemplate));
+        $this->assertEquals('Hello Tom Tom', $textTemplate->resolve());
 
         $textTemplate = $textTemplateFactory->create('{first} {second}',[
             'first' => [
@@ -40,21 +38,21 @@ class TextTemplatesTest extends TestCase
                 ]
             ]
         ]);
-        $this->assertEquals('Hello Tom. Hello Jerry.', $textTemplatesResolver->resolve($textTemplate));
+        $this->assertEquals('Hello Tom. Hello Jerry.', $textTemplate->resolve());
 
         { // Message format
             $textTemplate = $textTemplateFactory->create('{number, plural, =0{Zero}=1{One}other{Unknown #}}', [
                 'number' => 0,
-            ], MessageFormatsEnum::MESSAGE_FORMATTER);
+            ], MessageFormatsEnum::PLURAL_TEMPLATE);
             $numberTextTemplate = $textTemplate->getChildTextTemplatesCollection()->get('number');
 
-            $this->assertEquals('Zero', $textTemplatesResolver->resolve($textTemplate));
+            $this->assertEquals('Zero', $textTemplate->resolve());
 
             $numberTextTemplate->setContent(1);
-            $this->assertEquals('One', $textTemplatesResolver->resolve($textTemplate));
+            $this->assertEquals('One', $textTemplate->resolve());
 
             $numberTextTemplate->setContent(50);
-            $this->assertEquals('Unknown 50', $textTemplatesResolver->resolve($textTemplate));
+            $this->assertEquals('Unknown 50', $textTemplate->resolve());
         }
 
         { // Plural with another text, on different TextTemplate, without translate
@@ -64,11 +62,11 @@ class TextTemplatesTest extends TestCase
                     'parameters' => [
                         'appleNumbers' => 1,
                     ],
-                    'format' => MessageFormatsEnum::MESSAGE_FORMATTER,
+                    'format' => MessageFormatsEnum::PLURAL_TEMPLATE,
                 ],
             ]);
 
-            $this->assertEquals("Tom has one apple", $textTemplatesResolver->resolve($textTemplate));
+            $this->assertEquals("Tom has one apple", $textTemplate->resolve());
 
             $numberTextTemplate = $textTemplate
                 ->getChildTextTemplatesCollection()
@@ -78,14 +76,14 @@ class TextTemplatesTest extends TestCase
             ;
             $numberTextTemplate->setContent(0);
 
-            $this->assertEquals("Tom has no one apple", $textTemplatesResolver->resolve($textTemplate));
+            $this->assertEquals("Tom has no one apple", $textTemplate->resolve());
         }
 
         { // Use object of TextTemplateItem in Factory
             $textTemplate = $textTemplateFactory->create('Tom has {object_name}', [
                 'object_name' => new TextTemplateItem('a pen'),
             ]);
-            self::assertEquals('Tom has a pen', $textTemplatesResolver->resolve($textTemplate));
+            self::assertEquals('Tom has a pen', $textTemplate->resolve());
         }
 
         { // Resolve two parameters with the same value
@@ -93,15 +91,7 @@ class TextTemplatesTest extends TestCase
                 'a' => 1,
                 'b' => 1,
             ]);
-            self::assertEquals('11', $textTemplatesResolver->resolve($textTemplate));
-        }
-
-        { // Check re-adding the key as a template
-            $textTemplate = $textTemplateFactory->create('Hello {user_name}', ['user_name' => 'Tom']);
-            $childTextTemplatesCollection = $textTemplate->getChildTextTemplatesCollection();
-            $userNameKey = $childTextTemplatesCollection->generateKey('user_name');
-            $newUserNameKey = $childTextTemplatesCollection->add(new TextTemplateItem($userNameKey));
-            self::assertEquals($newUserNameKey, $userNameKey);
+            self::assertEquals('11', $textTemplate->resolve());
         }
     }
 }

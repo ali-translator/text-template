@@ -2,14 +2,11 @@
 
 namespace ALI\TextTemplate;
 
-use ALI\TextTemplate\KeyGenerators\KeyGenerator;
 use ArrayIterator;
 use IteratorAggregate;
 
 class TextTemplatesCollection implements IteratorAggregate
 {
-    protected KeyGenerator $keyGenerator;
-
     /**
      * @var TextTemplateItem[]
      */
@@ -20,17 +17,7 @@ class TextTemplatesCollection implements IteratorAggregate
      */
     protected array $indexedSimplyTexts = [];
 
-    /**
-     * @var bool[]
-     */
-    protected array $existBufferKeys = [];
-
     protected int $idIncrementValue = 0;
-
-    public function __construct(KeyGenerator $keyGenerator)
-    {
-        $this->keyGenerator = $keyGenerator;
-    }
 
     /**
      * Add a textTemplate to collection and get its key to insert into the text
@@ -41,11 +28,6 @@ class TextTemplatesCollection implements IteratorAggregate
         ?string          $templateId = null
     ): string
     {
-        if (isset($this->existBufferKeys[$textTemplate->getContent()])) {
-            // Prevent adding the same key few times
-            return $textTemplate->getContent();
-        }
-
         $isSimpleText = !$textTemplate->getChildTextTemplatesCollection();
 
         $templateIdHash = $textTemplate->getIdHash();
@@ -61,10 +43,7 @@ class TextTemplatesCollection implements IteratorAggregate
             }
         }
 
-        $bufferKey = $this->generateKey($templateId);
-        $this->existBufferKeys[$bufferKey] = true;
-
-        return $bufferKey;
+        return $templateId;
     }
 
     public function get(string $templateId): ?TextTemplateItem
@@ -91,12 +70,9 @@ class TextTemplatesCollection implements IteratorAggregate
 
     public function clear(): void
     {
+        $this->idIncrementValue = 0;
         $this->textTemplates = [];
-    }
-
-    public function generateKey(string $templateId): string
-    {
-        return $this->keyGenerator->generateKey($templateId);
+        $this->indexedSimplyTexts = [];
     }
 
     public function getIterator(): ArrayIterator
@@ -104,8 +80,20 @@ class TextTemplatesCollection implements IteratorAggregate
         return new ArrayIterator($this->textTemplates);
     }
 
-    public function getKeyGenerator(): KeyGenerator
+    /**
+     * @param string[] $keys
+     */
+    public function sliceByKeys(array $keys): TextTemplatesCollection
     {
-        return $this->keyGenerator;
+        $partOfTextTemplatesCollection = clone $this;
+        $partOfTextTemplatesCollection->clear();
+        foreach ($keys as $keyId) {
+            $textTemplateItem = $this->get($keyId);
+            if ($textTemplateItem) {
+                $partOfTextTemplatesCollection->add($textTemplateItem, $keyId);
+            }
+        }
+
+        return $partOfTextTemplatesCollection;
     }
 }

@@ -2,23 +2,35 @@
 
 namespace ALI\TextTemplate;
 
-use ALI\TextTemplate\KeyGenerators\KeyGenerator;
-use ALI\TextTemplate\KeyGenerators\StaticKeyGenerator;
+use ALI\TextTemplate\MessageFormat\TemplateMessageResolver;
+use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
 
 class TextTemplateFactory
 {
-    protected KeyGenerator $keyGenerator;
+    protected TemplateMessageResolverFactory $templateMessageResolverFactory;
 
-    public function __construct(?KeyGenerator $keyGenerator = null)
+    public function __construct(TemplateMessageResolverFactory $templateMessageResolverFactory)
     {
-        $this->keyGenerator = $keyGenerator ?: new StaticKeyGenerator('{', '}');
+        $this->templateMessageResolverFactory = $templateMessageResolverFactory;
     }
 
-    public function create(string $content, array $parameters = [], string $messageFormat = null): TextTemplateItem
+    /**
+     * @param string $content
+     * @param array $parameters
+     * @param string|TemplateMessageResolver $messageFormat
+     * @param array $customTextItemOptions
+     * @return TextTemplateItem
+     */
+    public function create(
+        string $content,
+        array $parameters = [],
+        $messageFormat = null,
+        array $customTextItemOptions = []
+    ): TextTemplateItem
     {
         $textTemplatesCollection = null;
         if ($parameters) {
-            $textTemplatesCollection = new TextTemplatesCollection($this->keyGenerator);
+            $textTemplatesCollection = new TextTemplatesCollection();
             foreach ($parameters as $childContentId => $childData) {
                 if (!is_array($childData)) {
                     if ($childData instanceof TextTemplateItem) {
@@ -29,10 +41,10 @@ class TextTemplateFactory
                 } else {
                     $childContentSting = $childData['content'];
                     $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
-                    $childMessageFormat = $childData['format'] ?? null;
-                    $textTemplateItem = $this->create($childContentSting, $childParameters, $childMessageFormat);
+
+                    $textTemplateItem = $this->create($childContentSting, $childParameters, $childData['format'] ?? null);
                     if (isset($childData['options'])) {
-                        $textTemplateItem->setCustomNotes($childData['options']);
+                        $textTemplateItem->setCustomOptions($childData['options']);
                     }
                 }
 
@@ -40,6 +52,12 @@ class TextTemplateFactory
             }
         }
 
-        return new TextTemplateItem($content, $textTemplatesCollection, $messageFormat);
+        if (is_string($messageFormat)) {
+            $templateMessageResolver = $this->templateMessageResolverFactory->generateTemplateMessageResolver($messageFormat);
+        } else {
+            $templateMessageResolver = $messageFormat;
+        }
+
+        return new TextTemplateItem($content, $textTemplatesCollection, $templateMessageResolver, $customTextItemOptions);
     }
 }

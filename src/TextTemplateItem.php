@@ -2,7 +2,8 @@
 
 namespace ALI\TextTemplate;
 
-use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\MessageFormat\PlainTextMessageResolver;
+use ALI\TextTemplate\MessageFormat\TemplateMessageResolver;
 
 class TextTemplateItem
 {
@@ -10,22 +11,27 @@ class TextTemplateItem
 
     protected ?TextTemplatesCollection $childTextTemplatesCollection = null;
 
-    private string $messageFormat;
+    protected TemplateMessageResolver $templateMessageResolver;
 
     // If you need custom notes on TextTemplateItem, you can use this property
-    private array $customNotes = [];
+    private array $customOptions;
 
     public function __construct(
         string                  $template,
-        TextTemplatesCollection $childTextTemplatesCollection = null,
-        ?string                 $messageFormat = null,
-        array                   $customNotes = []
+        ?TextTemplatesCollection $childTextTemplatesCollection = null,
+        ?TemplateMessageResolver $templateMessageResolver = null,
+        array $customOptions = []
     )
     {
         $this->content = $template;
         $this->childTextTemplatesCollection = $childTextTemplatesCollection;
-        $this->messageFormat = $messageFormat ?: MessageFormatsEnum::TEXT_TEMPLATE;
-        $this->customNotes = $customNotes;
+        $this->templateMessageResolver = $templateMessageResolver ?? new PlainTextMessageResolver();
+        $this->customOptions = $customOptions;
+    }
+
+    public function resolve(): string
+    {
+        return $this->templateMessageResolver->resolve($this);
     }
 
     public function getContent(): string
@@ -48,14 +54,14 @@ class TextTemplateItem
         $this->childTextTemplatesCollection = $childTextTemplatesCollection;
     }
 
-    public function getCustomNotes(): array
+    public function getCustomOptions(): array
     {
-        return $this->customNotes;
+        return $this->customOptions;
     }
 
-    public function setCustomNotes(array $customNotes): void
+    public function setCustomOptions(array $customOptions): void
     {
-        $this->customNotes = $customNotes;
+        $this->customOptions = $customOptions;
     }
 
     private string $_idHash;
@@ -63,8 +69,8 @@ class TextTemplateItem
     public function getIdHash(): string
     {
         if (!isset($this->_idHash)) {
-            $this->_idHash = $this->messageFormat . '#' . $this->content;
-            foreach ($this->customNotes as $key => $value) {
+            $this->_idHash = $this->templateMessageResolver->getFormatName() . '#' . $this->content;
+            foreach ($this->customOptions as $key => $value) {
                 $this->_idHash .= '#' . $key . ':';
                 switch (true) {
                     case is_bool($value):
@@ -88,6 +94,6 @@ class TextTemplateItem
 
     public function getMessageFormat(): string
     {
-        return $this->messageFormat;
+        return $this->templateMessageResolver->getFormatName();
     }
 }
