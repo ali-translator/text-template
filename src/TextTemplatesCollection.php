@@ -35,7 +35,7 @@ class TextTemplatesCollection implements IteratorAggregate
             // If this text already exist and its without parameters - return old key
             $templateId = $this->indexedSimplyTexts[$templateIdHash];
         } else {
-            // Adding new unique bufferContent
+            // Adding new unique content
             $templateId = $templateId ?: (string)$this->idIncrementValue++;
             $this->textTemplates[$templateId] = $textTemplate;
             if ($isSimpleText) {
@@ -54,9 +54,9 @@ class TextTemplatesCollection implements IteratorAggregate
     public function remove(string $templateId)
     {
         if (isset($this->textTemplates[$templateId])) {
-            $buffersContent = $this->textTemplates[$templateId];
+            $content = $this->textTemplates[$templateId];
             unset($this->textTemplates[$templateId]);
-            unset($this->indexedSimplyTexts[$buffersContent->getIdHash()]);
+            unset($this->indexedSimplyTexts[$content->getIdHash()]);
         }
     }
 
