@@ -2,6 +2,7 @@
 
 namespace ALI\TextTemplate;
 
+use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\MessageFormat\TemplateMessageResolver;
 use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
 
@@ -24,7 +25,7 @@ class TextTemplateFactory
     public function create(
         string $content,
         array $parameters = [],
-        $messageFormat = null,
+               $messageFormat = null,
         array $customTextItemOptions = []
     ): TextTemplateItem
     {
@@ -52,6 +53,9 @@ class TextTemplateFactory
             }
         }
 
+        if (!$messageFormat) {
+            $messageFormat = $textTemplatesCollection ? MessageFormatsEnum::TEXT_TEMPLATE : MessageFormatsEnum::PLAIN_TEXT;
+        }
         if (is_string($messageFormat)) {
             $templateMessageResolver = $this->templateMessageResolverFactory->generateTemplateMessageResolver($messageFormat);
         } else {
