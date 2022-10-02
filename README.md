@@ -41,8 +41,7 @@ MessageFormatsEnum::PLURAL_TEMPLATE;
 ```
 
 ### Tests
-In packet exist docker-compose file, with environment for testing.
 ```bash
-docker-compose run php composer install
-docker-compose run php vendor/bin/phpunit
+php composer install
+php vendor/bin/phpunit
 ```

@@ -1,8 +1,0 @@
-version: '3.6'
-services:
-    php:
-        image: chialab/php:7.4
-        working_dir: /var/www/text-template
-        volumes:
-            - ./:/var/www/text-template
-

@@ -40,7 +40,7 @@ class TextTemplateFactory
                         $textTemplateItem = $this->create((string)$childData);
                     }
                 } else {
-                    $childContentSting = $childData['content'];
+                    $childContentSting = $childData['content'] ?? '';
                     $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
 
                     $textTemplateItem = $this->create($childContentSting, $childParameters, $childData['format'] ?? null);
