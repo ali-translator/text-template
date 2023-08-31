@@ -1,14 +1,13 @@
 <?php
 
-namespace ALI\TextTemplate\Tests;
+namespace ALI\TextTemplate\Tests\TemplateResolver\Template;
 
-use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplateItem;
 use PHPUnit\Framework\TestCase;
 
-class TextTemplatesTest extends TestCase
+class TextTemplateMessageResolverTest extends TestCase
 {
     public function test()
     {
@@ -43,44 +42,6 @@ class TextTemplatesTest extends TestCase
         ]);
         $this->assertEquals('Hello Tom. Hello Jerry.', $textTemplate->resolve());
 
-        { // Message format
-            $textTemplate = $textTemplateFactory->create('{number, plural, =0{Zero}=1{One}other{Unknown #}}', [
-                'number' => 0,
-            ], MessageFormatsEnum::PLURAL_TEMPLATE);
-            $numberTextTemplate = $textTemplate->getChildTextTemplatesCollection()->get('number');
-
-            $this->assertEquals('Zero', $textTemplate->resolve());
-
-            $numberTextTemplate->setContent(1);
-            $this->assertEquals('One', $textTemplate->resolve());
-
-            $numberTextTemplate->setContent(50);
-            $this->assertEquals('Unknown 50', $textTemplate->resolve());
-        }
-
-        { // Plural with another text, on different TextTemplate, without translate
-            $textTemplate = $textTemplateFactory->create('Tom has {appleNumbers}', [
-                'appleNumbers' => [
-                    'content' => '{appleNumbers, plural, =0{no one apple}=1{one apple}other{many apples}}',
-                    'parameters' => [
-                        'appleNumbers' => 1,
-                    ],
-                    'format' => MessageFormatsEnum::PLURAL_TEMPLATE,
-                ],
-            ]);
-
-            $this->assertEquals("Tom has one apple", $textTemplate->resolve());
-
-            $numberTextTemplate = $textTemplate
-                ->getChildTextTemplatesCollection()
-                ->get('appleNumbers')
-                ->getChildTextTemplatesCollection()
-                ->get('appleNumbers');
-            $numberTextTemplate->setContent(0);
-
-            $this->assertEquals("Tom has no one apple", $textTemplate->resolve());
-        }
-
         { // Use object of TextTemplateItem in Factory
             $textTemplate = $textTemplateFactory->create('Tom has {object_name}', [
                 'object_name' => new TextTemplateItem('a pen'),
@@ -95,5 +56,28 @@ class TextTemplatesTest extends TestCase
             ]);
             self::assertEquals('11', $textTemplate->resolve());
         }
+    }
+
+    public function testTemplateWithLogicVariable()
+    {
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
+
+        // Template without "variable values"
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix}', []);
+        $this->assertEquals("Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix}", $textTemplate->resolve());
+
+        // Mixing variables types
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix} and {city_name|makeFirstCharacterInLowercase}', [
+            'user_name' => 'Tom',
+            'city_name' => 'i̇stanbul',
+        ]);
+        $this->assertEquals("Hello Tom from İstanbul'da and i̇stanbul", $textTemplate->resolve());
+
+        // Check logic variables with parameters
+        $templateContent = 'Розваги {city_name|chooseUkrainianBySonority("в")} {city_name}';
+        $textTemplate = $textTemplateFactory->create($templateContent, [
+            'city_name' => 'Києві',
+        ]);
+        $this->assertEquals("Розваги у Києві", $textTemplate->resolve());
     }
 }

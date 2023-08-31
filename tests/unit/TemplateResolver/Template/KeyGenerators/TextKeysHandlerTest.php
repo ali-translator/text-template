@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\Tests\KeyGenerators;
+namespace ALI\TextTemplate\Tests\TemplateResolver\Template\KeyGenerators;
 
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\StaticKeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
