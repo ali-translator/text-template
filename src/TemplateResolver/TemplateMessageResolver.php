@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\MessageFormat;
+namespace ALI\TextTemplate\TemplateResolver;
 
 use ALI\TextTemplate\TextTemplateItem;
 

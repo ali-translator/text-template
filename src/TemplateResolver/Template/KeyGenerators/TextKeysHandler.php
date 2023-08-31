@@ -1,12 +1,12 @@
 <?php
 
-namespace ALI\TextTemplate\KeyGenerators;
+namespace ALI\TextTemplate\TemplateResolver\Template\KeyGenerators;
 
 class TextKeysHandler
 {
     public function getAllKeys(
         KeyGenerator $keyGenerator,
-        ?string       $text
+        ?string      $text
     ): array
     {
         if (!$text) {
@@ -17,9 +17,10 @@ class TextKeysHandler
             return [];
         }
 
-        return $textParameterNames['id'];
+        return $textParameterNames['content_id'];
     }
 
+    // TODO this method using will be incorrect. Maybe we need to add something like this to "Resolver" interface?
     public function replaceKeys(
         KeyGenerator $keyGenerator,
         ?string      $text,
@@ -33,7 +34,7 @@ class TextKeysHandler
         return preg_replace_callback(
             $keyGenerator->getRegularExpression(),
             function ($matches) use ($callback) {
-                return $callback($matches['id']) ?? $matches[0];
+                return $callback($matches['content_id']) ?? $matches[0];
             },
             $text
         );

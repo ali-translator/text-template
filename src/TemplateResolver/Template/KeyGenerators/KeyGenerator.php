@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\KeyGenerators;
+namespace ALI\TextTemplate\TemplateResolver\Template\KeyGenerators;
 
 interface KeyGenerator
 {

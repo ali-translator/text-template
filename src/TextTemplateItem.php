@@ -2,8 +2,8 @@
 
 namespace ALI\TextTemplate;
 
-use ALI\TextTemplate\MessageFormat\PlainTextMessageResolver;
-use ALI\TextTemplate\MessageFormat\TemplateMessageResolver;
+use ALI\TextTemplate\TemplateResolver\Plain\PlainTextMessageResolver;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 
 class TextTemplateItem
 {

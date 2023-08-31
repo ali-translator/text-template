@@ -48,7 +48,7 @@ class TextTemplatesCollection implements IteratorAggregate
 
     public function get(string $templateId): ?TextTemplateItem
     {
-        return !empty($this->textTemplates[$templateId]) ? $this->textTemplates[$templateId] : null;
+        return $this->textTemplates[$templateId] ?? null;
     }
 
     public function remove(string $templateId)

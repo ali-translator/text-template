@@ -1,9 +1,13 @@
 <?php
 
-namespace ALI\TextTemplate\MessageFormat;
+namespace ALI\TextTemplate\TemplateResolver;
 
-use ALI\TextTemplate\KeyGenerators\KeyGenerator;
-use ALI\TextTemplate\KeyGenerators\StaticKeyGenerator;
+use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Plain\PlainTextMessageResolver;
+use ALI\TextTemplate\TemplateResolver\Plural\PluralTemplateMessageResolver;
+use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
+use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\StaticKeyGenerator;
+use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use RuntimeException;
 
 class TemplateMessageResolverFactory

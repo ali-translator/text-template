@@ -1,7 +1,9 @@
 <?php
 
-namespace ALI\TextTemplate\MessageFormat;
+namespace ALI\TextTemplate\TemplateResolver\Plain;
 
+use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateItem;
 
 class PlainTextMessageResolver implements TemplateMessageResolver

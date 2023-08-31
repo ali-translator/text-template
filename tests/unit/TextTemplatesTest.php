@@ -2,9 +2,9 @@
 
 namespace ALI\TextTemplate\Tests;
 
-use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
-use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
+use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplateItem;
 use PHPUnit\Framework\TestCase;
 
@@ -14,17 +14,20 @@ class TextTemplatesTest extends TestCase
     {
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
 
-        $textTemplate = $textTemplateFactory->create('Hello {user_name}',[
+        $textTemplate = $textTemplateFactory->create('Hello {user_name}', []);
+        $this->assertEquals('Hello {user_name}', $textTemplate->resolve());
+
+        $textTemplate = $textTemplateFactory->create('Hello {user_name}', [
             'user_name' => 'Tom'
         ]);
         $this->assertEquals('Hello Tom', $textTemplate->resolve());
 
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} {user_name}',[
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} {user_name}', [
             'user_name' => 'Tom'
         ]);
         $this->assertEquals('Hello Tom Tom', $textTemplate->resolve());
 
-        $textTemplate = $textTemplateFactory->create('{first} {second}',[
+        $textTemplate = $textTemplateFactory->create('{first} {second}', [
             'first' => [
                 'content' => 'Hello {user_name}.',
                 'parameters' => [
@@ -72,8 +75,7 @@ class TextTemplatesTest extends TestCase
                 ->getChildTextTemplatesCollection()
                 ->get('appleNumbers')
                 ->getChildTextTemplatesCollection()
-                ->get('appleNumbers')
-            ;
+                ->get('appleNumbers');
             $numberTextTemplate->setContent(0);
 
             $this->assertEquals("Tom has no one apple", $textTemplate->resolve());

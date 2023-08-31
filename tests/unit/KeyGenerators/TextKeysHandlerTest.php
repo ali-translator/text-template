@@ -2,8 +2,8 @@
 
 namespace ALI\TextTemplate\Tests\KeyGenerators;
 
-use ALI\TextTemplate\KeyGenerators\StaticKeyGenerator;
-use ALI\TextTemplate\KeyGenerators\TextKeysHandler;
+use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\StaticKeyGenerator;
+use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
 use PHPUnit\Framework\TestCase;
 
 class TextKeysHandlerTest extends TestCase
