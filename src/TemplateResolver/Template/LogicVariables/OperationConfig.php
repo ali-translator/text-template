@@ -2,15 +2,17 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TextTemplatesCollection;
+
 class OperationConfig
 {
     private string $handlerAlias;
-    private array $config;
+    private array $rawConfig;
 
-    public function __construct(string $handlerAlias, array $config = [])
+    public function __construct(string $handlerAlias, array $rawConfig = [])
     {
         $this->handlerAlias = $handlerAlias;
-        $this->config = $config;
+        $this->rawConfig = $rawConfig;
     }
 
     public function getHandlerAlias(): string
@@ -18,8 +20,29 @@ class OperationConfig
         return $this->handlerAlias;
     }
 
-    public function getConfig(): array
+    public function resolveConfig(
+        TextTemplatesCollection $variablesCollection
+    ): array
     {
-        return $this->config;
+        $config = [];
+        foreach ($this->rawConfig as $key => $value) {
+            if (is_array($value) && $value['type'] === 'variable') {
+                $templateItem = $variablesCollection->get($value['value']);
+                if ($templateItem) {
+                    $config[$key] = $templateItem->resolve();
+                } else {
+                    $config[$key] = null;
+                }
+            } else {
+                $config[$key] = $value;
+            }
+        }
+
+        return $config;
+    }
+
+    public function getRawConfig(): array
+    {
+        return $this->rawConfig;
     }
 }

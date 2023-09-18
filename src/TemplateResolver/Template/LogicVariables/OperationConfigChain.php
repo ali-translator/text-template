@@ -2,6 +2,8 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TextTemplatesCollection;
+
 class OperationConfigChain
 {
     /**
@@ -15,24 +17,31 @@ class OperationConfigChain
     }
 
     public function run(
-        string                      $variableValue,
+        TextTemplatesCollection     $variablesCollection,
         HandlersRepositoryInterface $handlersRepository
     ): ?string
     {
+        $previousOperationResult = '';
         foreach ($this->operationConfigs as $operationConfig) {
-            $variableValue = $this->runOperation($handlersRepository, $operationConfig, $variableValue);
-            if ($variableValue === null) {
+            $previousOperationResult = $this->runOperation(
+                $previousOperationResult,
+                $handlersRepository,
+                $operationConfig,
+                $variablesCollection
+            );
+            if ($previousOperationResult === null) {
                 return null;
             }
         }
 
-        return $variableValue;
+        return $previousOperationResult;
     }
 
     protected function runOperation(
+        string                      $previousOperationResult,
         HandlersRepositoryInterface $operatorRepository,
         OperationConfig             $operationConfig,
-        string                      $variableValue
+        TextTemplatesCollection     $variablesCollection
     ): ?string
     {
         $handler = $operatorRepository->find($operationConfig->getHandlerAlias());
@@ -40,6 +49,10 @@ class OperationConfigChain
             return null;
         }
 
-        return $handler->run($variableValue, $operationConfig->getConfig());
+        $config = $operationConfig->resolveConfig($variablesCollection);
+
+        return $handler->run($previousOperationResult, $config);
     }
+
+    // TODO add method "getAllVariablesConfigs"
 }

@@ -29,7 +29,7 @@ class TurkishFrontAndBackVowelsHelper
 
     public static function getLastVowel(string $word): ?string
     {
-        foreach (mb_str_split($word) as $character) {
+        foreach (array_reverse(mb_str_split($word)) as $character) {
             if (static::isCharacterIsVowel($character)) {
                 return $character;
             }

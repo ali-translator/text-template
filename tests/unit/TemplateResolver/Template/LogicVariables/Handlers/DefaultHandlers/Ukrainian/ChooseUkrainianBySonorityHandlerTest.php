@@ -49,8 +49,10 @@ class ChooseUkrainianBySonorityHandlerTest extends TestCase
         HandlerInterface $handler
     ): void
     {
-        foreach ($dataForCheck as $inputText => $correctResolvedText) {
-            $result = $handler->run($inputText, $config);
+        foreach ($dataForCheck as $cityName => $correctResolvedText) {
+            $currentConfig = $config;
+            $currentConfig[] = $cityName;
+            $result = $handler->run('', $currentConfig);
             $this->assertEquals($correctResolvedText, $result);
         }
     }

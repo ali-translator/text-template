@@ -14,8 +14,6 @@ class LogicVariableParser
     public function parse(string $logicVariable): LogicVariableData
     {
         $operations = explode($this->operationDelimiter, $logicVariable);
-        $variableId = array_shift($operations);
-
         $handlerConfigsChain = new OperationConfigChain();
 
         foreach ($operations as $operation) {
@@ -29,10 +27,23 @@ class LogicVariableParser
             if (empty($matches['parameters'])) {
                 $operationConfig = [];
             } else {
-                if (!preg_match_all('/"([^"\\\\]*(\\\\.[^"\\\\]*)*)",?/', $matches['parameters'], $matches)) {
-                    continue;
+                $explodedParameters = explode(',', $matches['parameters']);
+
+                $operationConfig = [];
+                foreach ($explodedParameters as $parameter) {
+                    $parameterWithoutSpaces = trim($parameter);
+                    $parameterWithoutQuotes = trim($parameterWithoutSpaces,'\'"');
+                    if ($parameterWithoutSpaces === $parameterWithoutQuotes) {
+                        // Variable id
+                        $operationConfig[] = [
+                            'type' => 'variable',
+                            'value' => $parameterWithoutQuotes,
+                        ];
+                    } else {
+                        // Static data
+                        $operationConfig[] = $parameterWithoutQuotes;
+                    }
                 }
-                $operationConfig = $matches[1];
             }
 
             $handlerConfigsChain->addOperationConfig(
@@ -40,18 +51,12 @@ class LogicVariableParser
             );
         }
 
-        return new LogicVariableData($variableId, $handlerConfigsChain);
+        return new LogicVariableData($handlerConfigsChain);
     }
 
     // If you only need check "is text is a LogicalVariable", this method will be the fastest, even from "getVariableId"
     public function isTextLogicalVariable(string $logicVariable): bool
     {
         return strpos($logicVariable, $this->operationDelimiter) !== false;
-    }
-
-    // If you only need the "variable id", this method will be the fastest
-    public function getVariableId(string $logicVariable): string
-    {
-        return strtok($logicVariable, $this->operationDelimiter) ?: '';
     }
 }

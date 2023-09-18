@@ -24,12 +24,17 @@ class ChooseUkrainianBySonorityHandler implements HandlerInterface
 
     public function run(string $inputText, array $config): string
     {
-        $wordAfter = $inputText;
-        $lastLetterOfPreviousWord = $config[0] ?? '';
+        $lastLetterOfPreviousWord = $config[0] ?? null;
         $originalPreposition = $config[1] ?? null;
-        if (!$originalPreposition) {
+        $wordAfter = $config[2] ?? null;
+
+        // TODO add separated "validate" method !
+        if ($lastLetterOfPreviousWord === null || $originalPreposition === null || $wordAfter === null) {
             return '';
         }
+
+        // Also accepts "full word" for better syntax reading
+        $lastLetterOfPreviousWord = mb_substr($lastLetterOfPreviousWord, -1, 1);
 
         $prepositionCouple = static::$prepositionCouples[$originalPreposition] ?? null;
         if (!$prepositionCouple) {

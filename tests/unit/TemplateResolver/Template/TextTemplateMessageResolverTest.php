@@ -63,21 +63,28 @@ class TextTemplateMessageResolverTest extends TestCase
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
 
         // Template without "variable values"
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix}', []);
-        $this->assertEquals("Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix}", $textTemplate->resolve());
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}', []);
+        $this->assertEquals("Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}", $textTemplate->resolve());
 
         // Mixing variables types
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix} and {city_name|makeFirstCharacterInLowercase}', [
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase} and {print(city_name)|makeFirstCharacterInLowercase}', [
             'user_name' => 'Tom',
             'city_name' => 'i̇stanbul',
         ]);
         $this->assertEquals("Hello Tom from İstanbul'da and i̇stanbul", $textTemplate->resolve());
 
         // Check logic variables with parameters
-        $templateContent = 'Розваги {city_name|UK_chooseBySonority("и","в/у")} {city_name}';
+        $templateContent = 'Розваги {UK_chooseBySonority("Розваги", "в/у", city_name)} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
         $this->assertEquals("Розваги в Києві", $textTemplate->resolve());
+
+        // Check undefined logic variable
+        $templateContent = 'Розваги {some_undefined_variable("123")} {city_name}';
+        $textTemplate = $textTemplateFactory->create($templateContent, [
+            'city_name' => 'Києві',
+        ]);
+        $this->assertEquals('Розваги {some_undefined_variable("123")} Києві', $textTemplate->resolve());
     }
 }

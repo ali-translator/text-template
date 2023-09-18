@@ -9,6 +9,8 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
+use ALI\TextTemplate\TextTemplateItem;
+use ALI\TextTemplate\TextTemplatesCollection;
 use PHPUnit\Framework\TestCase;
 
 class LogicalTextTemplatesTest extends TestCase
@@ -35,13 +37,13 @@ class LogicalTextTemplatesTest extends TestCase
         $dataForCheck = [
             '' => "",
         ];
-        $logicVariableTemplate = 'variable_name|' . AddTurkishLocativeSuffixHandler::getAlias() . '|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
+        $logicVariableTemplate = AddTurkishLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 
     protected function checkHandlerWithParameters(LogicVariableParser $logicVariableParser, HandlersRepositoryInterface $handlersRepository): void
     {
-        $logicVariableTemplate = 'city_name|UK_chooseBySonority("и","в/у")';
+        $logicVariableTemplate = 'UK_chooseBySonority("и","в/у", city_name)';
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',
@@ -62,7 +64,7 @@ class LogicalTextTemplatesTest extends TestCase
             'İstanbul' => "İstanbul'da",
             'düzce' => "Düzce'de",
         ];
-        $logicVariableTemplate = 'variable_name|' . AddTurkishLocativeSuffixHandler::getAlias() . '|' . FirstCharacterInUppercaseHandler::getAlias();
+        $logicVariableTemplate = AddTurkishLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias();
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 
@@ -74,10 +76,12 @@ class LogicalTextTemplatesTest extends TestCase
     ): void
     {
         foreach ($dataForCheck as $cityName => $correctCityNameTransformationResult) {
+            $variablesCollection = new TextTemplatesCollection();
+            $variablesCollection->add(new TextTemplateItem($cityName), 'city_name');
+
             $logicVariableData = $logicVariableParser->parse($logicVariableTemplate);
             $resolvedText = $logicVariableData
-                ->getOperationConfigChain()
-                ->run($cityName, $handlersRepository);
+                ->run($variablesCollection, $handlersRepository);
 
             $this->assertEquals($correctCityNameTransformationResult, $resolvedText);
         }

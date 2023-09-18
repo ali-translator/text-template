@@ -13,17 +13,21 @@ class AddTurkishLocativeSuffixHandler implements HandlerInterface
 
     public function run(string $inputText, array $config): string
     {
-        $lastVowelType = TurkishFrontAndBackVowelsHelper::getLastVowelType($inputText);
+        $locative = $config[0] ?? $inputText;
+        if (!$locative) {
+            return '';
+        }
+        $lastVowelType = TurkishFrontAndBackVowelsHelper::getLastVowelType($locative);
         if (!$lastVowelType) {
-            return $inputText;
+            return $locative;
         }
 
         if ($lastVowelType === TurkishFrontAndBackVowelsHelper::FRONT) {
-            $inputText .= "'de";
+            $locative .= "'de";
         } else {
-            $inputText .= "'da";
+            $locative .= "'da";
         }
 
-        return $inputText;
+        return $locative;
     }
 }

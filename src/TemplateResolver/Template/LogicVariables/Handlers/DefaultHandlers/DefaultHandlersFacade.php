@@ -5,6 +5,7 @@ namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Def
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInLowercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInUppercaseHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PrintHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddTurkishLocativeSuffixHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian\ChooseUkrainianBySonorityHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
@@ -23,6 +24,7 @@ class DefaultHandlersFacade
     {
         if (!isset($this->_handlers)) {
             $this->_handlers = [
+                new PrintHandler(),
                 new FirstCharacterInLowercaseHandler(),
                 new FirstCharacterInUppercaseHandler(),
                 new AddTurkishLocativeSuffixHandler(),
