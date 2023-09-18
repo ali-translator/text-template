@@ -63,21 +63,21 @@ class TextTemplateMessageResolverTest extends TestCase
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
 
         // Template without "variable values"
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix}', []);
-        $this->assertEquals("Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix}", $textTemplate->resolve());
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix}', []);
+        $this->assertEquals("Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix}", $textTemplate->resolve());
 
         // Mixing variables types
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|addTurkishLocativeSuffix} and {city_name|makeFirstCharacterInLowercase}', [
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {city_name|makeFirstCharacterInUppercase|TR_addLocativeSuffix} and {city_name|makeFirstCharacterInLowercase}', [
             'user_name' => 'Tom',
             'city_name' => 'i̇stanbul',
         ]);
         $this->assertEquals("Hello Tom from İstanbul'da and i̇stanbul", $textTemplate->resolve());
 
         // Check logic variables with parameters
-        $templateContent = 'Розваги {city_name|chooseUkrainianBySonority("в")} {city_name}';
+        $templateContent = 'Розваги {city_name|UK_chooseBySonority("и","в/у")} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
-        $this->assertEquals("Розваги у Києві", $textTemplate->resolve());
+        $this->assertEquals("Розваги в Києві", $textTemplate->resolve());
     }
 }

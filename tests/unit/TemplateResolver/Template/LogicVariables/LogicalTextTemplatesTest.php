@@ -41,7 +41,7 @@ class LogicalTextTemplatesTest extends TestCase
 
     protected function checkHandlerWithParameters(LogicVariableParser $logicVariableParser, HandlersRepositoryInterface $handlersRepository): void
     {
-        $logicVariableTemplate = 'city_name|chooseUkrainianBySonority("в", "и")';
+        $logicVariableTemplate = 'city_name|UK_chooseBySonority("и","в/у")';
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',

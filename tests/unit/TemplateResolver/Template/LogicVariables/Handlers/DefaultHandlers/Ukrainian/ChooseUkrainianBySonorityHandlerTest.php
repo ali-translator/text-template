@@ -13,19 +13,17 @@ class ChooseUkrainianBySonorityHandlerTest extends TestCase
         $handler = new ChooseUkrainianBySonorityHandler();
 
         // If you do not set the "previous letter", it will work as the "beginning of a sentence"
-        $config = ['в'];
+        $config = ['', 'в/у'];
         $dataForCheck = [
             'Києві' => 'у',
             'Одесі' => 'в',
             'Ялті' => 'у',
             'Львові' => 'у',
         ];
-        $this->check($dataForCheck, $config, $handler);
-        $config = ['у']; // revert
         $this->check($dataForCheck, $config, $handler);
 
         // Set "consonants" as a "previous letter"
-        $config = ['в',"н"];
+        $config = ['н','в/у'];
         $dataForCheck = [
             'Києві' => 'у',
             'Одесі' => 'в',
@@ -33,19 +31,15 @@ class ChooseUkrainianBySonorityHandlerTest extends TestCase
             'Львові' => 'у',
         ];
         $this->check($dataForCheck, $config, $handler);
-        $config = ['у',"н"]; // revert
-        $this->check($dataForCheck, $config, $handler);
 
         // Set "vowel" as a "previous letter"
-        $config = ['в',"и"];
+        $config = ["и",'в/у'];
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',
             'Ялті' => 'в',
             'Львові' => 'у',
         ];
-        $this->check($dataForCheck, $config, $handler);
-        $config = ['у',"и"]; // revert
         $this->check($dataForCheck, $config, $handler);
     }
 
@@ -56,7 +50,8 @@ class ChooseUkrainianBySonorityHandlerTest extends TestCase
     ): void
     {
         foreach ($dataForCheck as $inputText => $correctResolvedText) {
-            $this->assertEquals($correctResolvedText, $handler->run($inputText,$config));
+            $result = $handler->run($inputText, $config);
+            $this->assertEquals($correctResolvedText, $result);
         }
     }
 }

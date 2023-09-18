@@ -8,44 +8,40 @@ class ChooseUkrainianBySonorityHandler implements HandlerInterface
 {
     public static function getAlias(): string
     {
-        return 'chooseUkrainianBySonority';
+        return 'UK_chooseBySonority';
     }
 
-    protected static array $prepositionCouplesForFirstVowelChar = [
-        'в' => 'у',
-    ];
-
-    protected static array $prepositionCouplesForFirstConsonantChar = [
-        'у' => 'в',
+    protected static array $prepositionCouples = [
+        'в/у' => [
+            'forVowel' => 'в',
+            'forConsonant' => 'у'
+        ],
+        'у/в' => [
+            'forVowel' => 'в',
+            'forConsonant' => 'у'
+        ],
     ];
 
     public function run(string $inputText, array $config): string
     {
-        $originalPreposition = $config[0] ?? null;
-        $firstLetterOfPreviousWord = $config[1] ?? '';
+        $wordAfter = $inputText;
+        $lastLetterOfPreviousWord = $config[0] ?? '';
+        $originalPreposition = $config[1] ?? null;
         if (!$originalPreposition) {
+            return '';
+        }
+
+        $prepositionCouple = static::$prepositionCouples[$originalPreposition] ?? null;
+        if (!$prepositionCouple) {
             return $originalPreposition;
         }
+        $forVowel = $prepositionCouple['forVowel'];
+        $forConsonant = $prepositionCouple['forConsonant'];
 
-        $alternativePreposition = static::$prepositionCouplesForFirstVowelChar[$originalPreposition] ?? null;
-        if ($alternativePreposition) {
-            $forVowel = $originalPreposition;
-            $forConsonant = $alternativePreposition;
-        } else {
-            $alternativePreposition = static::$prepositionCouplesForFirstConsonantChar[$originalPreposition] ?? null;
-            if ($alternativePreposition) {
-                $forVowel = $alternativePreposition;
-                $forConsonant = $originalPreposition;
-            }
-        }
-        if (!isset($forVowel) || !isset($forConsonant)) {
-            return $originalPreposition;
-        }
+        // Якщо остання буква перед "у"/"в" - голосна
+        if ($lastLetterOfPreviousWord && UkrainianLettersHelper::isVowels($lastLetterOfPreviousWord)) {
 
-        if ($firstLetterOfPreviousWord && UkrainianLettersHelper::isVowels($firstLetterOfPreviousWord)) {
-            // Якщо остання буква перед "у"/"в" - голосна
-
-            if (preg_match('/^(в|ф|льв|св|тв|хв)/iu', $inputText)) {
+            if (preg_match('/^(в|ф|льв|св|тв|хв)/iu', $wordAfter)) {
                 // пишемо "у" якщо "слово після" починається з "в","ф", "льв", "св", "тв", "хв"
                 return $forConsonant;
             } else {
@@ -55,7 +51,7 @@ class ChooseUkrainianBySonorityHandler implements HandlerInterface
         } else {
             // Все інше (містить: "приголосні букви","символ" або "це на початку речення")
 
-            $firstLetterOfNextWord = mb_strtolower(mb_substr($inputText, 0, 1));
+            $firstLetterOfNextWord = mb_strtolower(mb_substr($wordAfter, 0, 1));
             if (!$firstLetterOfNextWord) {
                 return $originalPreposition;
             }

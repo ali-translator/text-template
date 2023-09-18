@@ -66,7 +66,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                     return $childValue->resolve();
                 }
 
-                // Template variable with additional handler operations
+                // Logic variable with additional handlers operations
                 $variableId = $this->logicVariableParser->getVariableId($variableContent);
                 if ($variableId !== $variableContent) {
                     $childValue = $childTextTemplatesCollection->get($variableId);
@@ -75,7 +75,10 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
                         return $logicVariableData
                             ->getOperationConfigChain()
-                            ->run($childValue->resolve(), $this->handlersRepository);
+                            ->run(
+                                $childValue->resolve(),
+                                $this->handlersRepository
+                            );
                     }
                 }
 

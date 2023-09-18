@@ -6,6 +6,11 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
 
 class AddTurkishLocativeSuffixHandler implements HandlerInterface
 {
+    public static function getAlias(): string
+    {
+        return 'TR_addLocativeSuffix';
+    }
+
     public function run(string $inputText, array $config): string
     {
         $lastVowelType = TurkishFrontAndBackVowelsHelper::getLastVowelType($inputText);
@@ -20,10 +25,5 @@ class AddTurkishLocativeSuffixHandler implements HandlerInterface
         }
 
         return $inputText;
-    }
-
-    public static function getAlias(): string
-    {
-        return 'addTurkishLocativeSuffix';
     }
 }
