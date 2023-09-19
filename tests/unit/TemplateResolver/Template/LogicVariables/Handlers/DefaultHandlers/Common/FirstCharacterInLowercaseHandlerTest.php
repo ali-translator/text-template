@@ -2,8 +2,8 @@
 
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInLowercaseHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use PHPUnit\Framework\TestCase;
 
 class FirstCharacterInLowercaseHandlerTest extends TestCase

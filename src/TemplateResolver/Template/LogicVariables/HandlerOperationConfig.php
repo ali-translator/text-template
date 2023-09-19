@@ -4,7 +4,7 @@ namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
 use ALI\TextTemplate\TextTemplatesCollection;
 
-class OperationConfig
+class HandlerOperationConfig
 {
     private string $handlerAlias;
     private array $rawConfig;
@@ -44,5 +44,20 @@ class OperationConfig
     public function getRawConfig(): array
     {
         return $this->rawConfig;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAllPlainVariablesNames(): array
+    {
+        $plainVariablesNames = [];
+        foreach ($this->rawConfig as $key => $value) {
+            if (is_array($value) && $value['type'] === 'variable') {
+                $plainVariablesNames[] = $value['value'];
+            }
+        }
+
+        return $plainVariablesNames;
     }
 }

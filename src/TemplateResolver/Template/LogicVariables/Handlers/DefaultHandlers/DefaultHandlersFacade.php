@@ -2,44 +2,59 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInLowercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInUppercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PrintHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddTurkishLocativeSuffixHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian\ChooseUkrainianBySonorityHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 
 class DefaultHandlersFacade
 {
-    /**
-     * @var HandlerInterface[]
-     */
-    private array $_handlers;
+    static array $allHandlersClasses = [
+        PrintHandler::class,
+        FirstCharacterInLowercaseHandler::class,
+        FirstCharacterInUppercaseHandler::class,
+        Turkish\AddLocativeSuffixHandler::class,
+        Ukrainian\ChoosePrepositionBySonorityHandler::class,
+        Russian\ChoosePrepositionBySonorityHandler::class,
+    ];
 
     /**
+     * @param string[]|null $forLanguagesISO
      * @return HandlerInterface[]
      */
-    public function getAllHandlers(): array
+    public function createHandlers(
+        ?array $forLanguagesISO
+    ): array
     {
-        if (!isset($this->_handlers)) {
-            $this->_handlers = [
-                new PrintHandler(),
-                new FirstCharacterInLowercaseHandler(),
-                new FirstCharacterInUppercaseHandler(),
-                new AddTurkishLocativeSuffixHandler(),
-                new ChooseUkrainianBySonorityHandler(),
-            ];
+        $handlers = [];
+        foreach (static::$allHandlersClasses as $handlerClassName) {
+            if ($forLanguagesISO !== null) {
+                /** @var HandlerInterface $handlerClassName */
+                $allowedLanguagesIso = $handlerClassName::getAllowedLanguagesIso();
+                if ($allowedLanguagesIso !== null) {
+                    // At least one language must be intersected
+                    if (!array_intersect($forLanguagesISO, $allowedLanguagesIso)) {
+                        continue;
+                    }
+                }
+            }
+            $handlers[] = new $handlerClassName();
         }
-        return $this->_handlers;
+
+        return $handlers;
     }
 
+    /**
+     * @param string[]|null $forLanguagesISO
+     */
     public function registerHandlers(
-        HandlersRepositoryInterface $handlersRepository
+        HandlersRepositoryInterface $handlersRepository,
+        ?array                      $forLanguagesISO
     ): HandlersRepositoryInterface
     {
         $handlersRepository = clone $handlersRepository;
-        $handlers = $this->getAllHandlers();
+        $handlers = $this->createHandlers($forLanguagesISO);
         foreach ($handlers as $handler) {
             $handlersRepository->addHandler($handler);
         }

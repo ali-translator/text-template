@@ -20,7 +20,6 @@ class TextKeysHandler
         return $textParameterNames['content_id'];
     }
 
-    // TODO this method using will be incorrect. Maybe we need to add something like this to "Resolver" interface?
     public function replaceKeys(
         KeyGenerator $keyGenerator,
         ?string      $text,

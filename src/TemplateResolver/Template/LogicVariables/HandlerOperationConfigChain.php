@@ -2,16 +2,17 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TextTemplatesCollection;
 
-class OperationConfigChain
+class HandlerOperationConfigChain
 {
     /**
-     * @var OperationConfig[]
+     * @var HandlerOperationConfig[]
      */
     private array $operationConfigs = [];
 
-    public function addOperationConfig(OperationConfig $operationConfig)
+    public function addOperationConfig(HandlerOperationConfig $operationConfig)
     {
         $this->operationConfigs[] = $operationConfig;
     }
@@ -40,7 +41,7 @@ class OperationConfigChain
     protected function runOperation(
         string                      $previousOperationResult,
         HandlersRepositoryInterface $operatorRepository,
-        OperationConfig             $operationConfig,
+        HandlerOperationConfig      $operationConfig,
         TextTemplatesCollection     $variablesCollection
     ): ?string
     {
@@ -54,5 +55,20 @@ class OperationConfigChain
         return $handler->run($previousOperationResult, $config);
     }
 
-    // TODO add method "getAllVariablesConfigs"
+    /**
+     * @return string[]
+     */
+    public function getAllPlainVariablesNames(): array
+    {
+        $plainVariablesNames = [];
+        foreach ($this->operationConfigs as $operationConfig) {
+            $plainVariablesNames[] = $operationConfig->getAllPlainVariablesNames();
+        }
+        if ($plainVariablesNames) {
+            $plainVariablesNames = array_merge(...$plainVariablesNames);
+            $plainVariablesNames = array_unique($plainVariablesNames);
+        }
+
+        return $plainVariablesNames;
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template;
 
+use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplateItem;
@@ -60,31 +62,48 @@ class TextTemplateMessageResolverTest extends TestCase
 
     public function testTemplateWithLogicVariable()
     {
-        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('tr'));
 
         // Template without "variable values"
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}', []);
-        $this->assertEquals("Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}", $textTemplate->resolve());
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}', []);
+        $this->assertEquals("Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}", $textTemplate->resolve());
 
         // Mixing variables types
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {TR_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase} and {print(city_name)|makeFirstCharacterInLowercase}', [
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase} and {|print(city_name)|makeFirstCharacterInLowercase}', [
             'user_name' => 'Tom',
             'city_name' => 'i̇stanbul',
         ]);
         $this->assertEquals("Hello Tom from İstanbul'da and i̇stanbul", $textTemplate->resolve());
 
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('uk'));
+
         // Check logic variables with parameters
-        $templateContent = 'Розваги {UK_chooseBySonority("Розваги", "в/у", city_name)} {city_name}';
+        $templateContent = 'Розваги {|uk_choosePrepositionBySonority("Розваги", "в/у", city_name)} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
         $this->assertEquals("Розваги в Києві", $textTemplate->resolve());
 
         // Check undefined logic variable
-        $templateContent = 'Розваги {some_undefined_variable("123")} {city_name}';
+        $templateContent = 'Розваги {|some_undefined_variable("123")} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
-        $this->assertEquals('Розваги {some_undefined_variable("123")} Києві', $textTemplate->resolve());
+        $this->assertEquals('Розваги {|some_undefined_variable("123")} Києві', $textTemplate->resolve());
+    }
+
+    public function testGetAllUsedPlainVariables()
+    {
+        $templateMessageResolverFactory = new TemplateMessageResolverFactory('uk');
+        /** @var TextTemplateMessageResolver $templateMessageResolver */
+        $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
+
+        $content = 'Розваги {|some_undefined_variable("123",test_variable)} {|print(city_name)|makeFirstCharacterInLowercase} {test_variable_1}';
+        $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content);
+        $this->assertEquals([
+            "test_variable" => "test_variable",
+            "city_name" => "city_name",
+            "test_variable_1" => "test_variable_1"
+        ], $allUsedPlainVariables);
     }
 }

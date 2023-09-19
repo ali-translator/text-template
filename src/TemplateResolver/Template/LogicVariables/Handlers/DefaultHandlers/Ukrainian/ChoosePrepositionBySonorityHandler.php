@@ -2,13 +2,21 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\PipeManualData;
 
-class ChooseUkrainianBySonorityHandler implements HandlerInterface
+class ChoosePrepositionBySonorityHandler implements HandlerInterface
 {
     public static function getAlias(): string
     {
-        return 'UK_chooseBySonority';
+        return 'uk_choosePrepositionBySonority';
+    }
+
+    public static function getAllowedLanguagesIso(): ?array
+    {
+        return ['uk'];
     }
 
     protected static array $prepositionCouples = [
@@ -22,13 +30,12 @@ class ChooseUkrainianBySonorityHandler implements HandlerInterface
         ],
     ];
 
-    public function run(string $inputText, array $config): string
+    public function run(string $pipeInputText, array $config): string
     {
         $lastLetterOfPreviousWord = $config[0] ?? null;
         $originalPreposition = $config[1] ?? null;
         $wordAfter = $config[2] ?? null;
 
-        // TODO add separated "validate" method !
         if ($lastLetterOfPreviousWord === null || $originalPreposition === null || $wordAfter === null) {
             return '';
         }
@@ -69,5 +76,41 @@ class ChooseUkrainianBySonorityHandler implements HandlerInterface
             // все інше - пишемо "у"
             return $forConsonant;
         }
+    }
+
+    public static function generateManual(): HandlerManualData
+    {
+        $pipeManualData = new PipeManualData(
+            false,
+            false,
+            null,
+            null
+        );
+
+        $argumentManualData = [
+            new ArgumentManualData(0, true,
+                'lastWordOrItLastLetter', 'Last letter of the word preceding the preposition. Also accepts full word for better syntax readability.',[
+                    'Розваги',
+                    'Марш',
+                ]),
+            new ArgumentManualData(1, true,
+                'originalPreposition', 'The original preposition to be chosen based on sonority.',[
+                    'в/у'
+                ]),
+            new ArgumentManualData(2, true,
+                'wordAfter', 'The word immediately following the preposition.',[
+                    'Києві',
+                    'Одесі',
+                    'Львові',
+                ])
+        ];
+
+        return new HandlerManualData(
+            static::getAlias(),
+            static::getAllowedLanguagesIso(),
+            'Chooses the appropriate preposition ("у" or "в") based on the sonority of the preceding and following words. Specific to the Ukrainian language.',
+            $pipeManualData,
+            $argumentManualData
+        );
     }
 }

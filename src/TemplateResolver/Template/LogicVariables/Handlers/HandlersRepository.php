@@ -2,9 +2,6 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
-
 class HandlersRepository implements HandlersRepositoryInterface
 {
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
+namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers;
 
 interface HandlersRepositoryInterface
 {

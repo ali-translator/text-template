@@ -2,13 +2,14 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TextTemplatesCollection;
 
 class LogicVariableData
 {
-    private OperationConfigChain $operationConfigChain;
+    private HandlerOperationConfigChain $operationConfigChain;
 
-    public function __construct(OperationConfigChain $operationConfigChain)
+    public function __construct(HandlerOperationConfigChain $operationConfigChain)
     {
         $this->operationConfigChain = $operationConfigChain;
     }
@@ -19,5 +20,10 @@ class LogicVariableData
     ): ?string
     {
         return $this->operationConfigChain->run($variablesCollection, $handlersRepository);
+    }
+
+    public function getAllPlainVariablesNames(): array
+    {
+        return $this->operationConfigChain->getAllPlainVariablesNames();
     }
 }

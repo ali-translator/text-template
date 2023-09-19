@@ -2,11 +2,17 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+/**
+ * Parser for templates with "Logic variables" like this:
+ * 'Розваги {|uk_choosePrepositionBySonority("Розваги", "в/у", city_name)} {city_name}'
+ */
 class LogicVariableParser
 {
     private string $operationDelimiter;
 
-    public function __construct(string $operationDelimiter = '|')
+    public function __construct(
+        string $operationDelimiter = '|'
+    )
     {
         $this->operationDelimiter = $operationDelimiter;
     }
@@ -14,12 +20,13 @@ class LogicVariableParser
     public function parse(string $logicVariable): LogicVariableData
     {
         $operations = explode($this->operationDelimiter, $logicVariable);
-        $handlerConfigsChain = new OperationConfigChain();
+        $handlerConfigsChain = new HandlerOperationConfigChain();
 
         foreach ($operations as $operation) {
-
-            preg_match('/(?P<handler_alias>[-_a-zA-Z0-9]+)(\((?P<parameters>.*)\)$)?/', $operation, $matches);
-            if (!$matches) {
+            if (
+                !$operation
+                || !preg_match('/(?P<handler_alias>[-_a-zA-Z0-9]+)(\((?P<parameters>.*)\)$)?/', $operation, $matches)
+            ) {
                 continue;
             }
 
@@ -47,16 +54,21 @@ class LogicVariableParser
             }
 
             $handlerConfigsChain->addOperationConfig(
-                new OperationConfig($operationName, $operationConfig)
+                new HandlerOperationConfig($operationName, $operationConfig)
             );
         }
 
         return new LogicVariableData($handlerConfigsChain);
     }
 
-    // If you only need check "is text is a LogicalVariable", this method will be the fastest, even from "getVariableId"
     public function isTextLogicalVariable(string $logicVariable): bool
     {
-        return strpos($logicVariable, $this->operationDelimiter) !== false;
+        // "strpos" is 4 times faster than "preg_match" for this case
+        return strpos($logicVariable, $this->operationDelimiter) === 0;
+    }
+
+    public function getOperationDelimiter(): string
+    {
+        return $this->operationDelimiter;
     }
 }

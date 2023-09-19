@@ -5,9 +5,9 @@ namespace ALI\TextTemplate\Tests\TemplateResolver\Template\LogicVariables;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInLowercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInUppercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\DefaultHandlersFacade;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddTurkishLocativeSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddLocativeSuffixHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
 use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplatesCollection;
@@ -19,12 +19,34 @@ class LogicalTextTemplatesTest extends TestCase
     {
         $logicVariableParser = new LogicVariableParser('|');
         $handlersRepository = (new DefaultHandlersFacade())->registerHandlers(
-            new HandlersRepository()
+            new HandlersRepository(),
+            null
         );
 
         $this->checkEmptyVariableValue($logicVariableParser, $handlersRepository);
         $this->checkHandlerWithParameters($logicVariableParser, $handlersRepository);
         $this->checkFewHandlersInChain($logicVariableParser, $handlersRepository);
+    }
+
+    public function testHandlerWithSpecificLanguage()
+    {
+        $logicVariableParser = new LogicVariableParser('|');
+        $handlersRepository = (new DefaultHandlersFacade())->registerHandlers(
+            new HandlersRepository(),
+            ['uk']
+        );
+
+        // Correct resolving
+        $logicVariableTemplate = '|uk_choosePrepositionBySonority("Розваги","в/у", city_name)';
+        $dataForCheck = ['Києві' => 'в'];
+        $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
+
+        // Use handler for another language(which not included)
+        $logicVariableTemplate = AddLocativeSuffixHandler::getAlias() . '(city_name)';
+        $dataForCheck = [
+            'İstanbul' => '',
+        ];
+        $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 
     /**
@@ -37,13 +59,13 @@ class LogicalTextTemplatesTest extends TestCase
         $dataForCheck = [
             '' => "",
         ];
-        $logicVariableTemplate = AddTurkishLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
+        $logicVariableTemplate = '|'.AddLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 
     protected function checkHandlerWithParameters(LogicVariableParser $logicVariableParser, HandlersRepositoryInterface $handlersRepository): void
     {
-        $logicVariableTemplate = 'UK_chooseBySonority("и","в/у", city_name)';
+        $logicVariableTemplate = '|uk_choosePrepositionBySonority("и","в/у", city_name)';
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',
@@ -64,7 +86,7 @@ class LogicalTextTemplatesTest extends TestCase
             'İstanbul' => "İstanbul'da",
             'düzce' => "Düzce'de",
         ];
-        $logicVariableTemplate = AddTurkishLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias();
+        $logicVariableTemplate = '|' . AddLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias();
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 

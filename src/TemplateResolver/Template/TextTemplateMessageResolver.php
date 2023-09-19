@@ -7,7 +7,8 @@ use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\DefaultHandlersFacade;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlersRepositoryInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateItem;
@@ -20,9 +21,9 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     private ?HandlersRepositoryInterface $handlersRepository;
 
     public function __construct(
-        KeyGenerator $keyGenerator,
-        ?HandlersRepositoryInterface $logicVariableHandlersRepository = null,
-        ?LogicVariableParser $logicVariableParser = null
+        KeyGenerator                $keyGenerator,
+        HandlersRepositoryInterface $logicVariableHandlersRepository,
+        LogicVariableParser         $logicVariableParser
     )
     {
         $this->keyGenerator = $keyGenerator;
@@ -30,7 +31,8 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
         if (!$logicVariableHandlersRepository) {
             $logicVariableHandlersRepository = (new DefaultHandlersFacade())->registerHandlers(
-                new HandlersRepository()
+                new HandlersRepository(),
+                null
             );
         }
         $this->handlersRepository = $logicVariableHandlersRepository;
@@ -67,8 +69,8 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 }
 
                 // Logic variable with additional handlers operations
-                $logicVariableData = $this->logicVariableParser->parse($variableContent);
-                if ($logicVariableData) {
+                if ($this->logicVariableParser->isTextLogicalVariable($variableContent)) {
+                    $logicVariableData = $this->logicVariableParser->parse($variableContent);
                     return $logicVariableData
                         ->run(
                             $childTextTemplatesCollection,
@@ -79,5 +81,45 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 return null;
             }
         );
+    }
+
+    public function getAllUsedPlainVariables(string $content): array
+    {
+        $allVariables = $this->parseAllVariables($content);
+
+        $allPlainVariablesNames = [];
+        foreach ($allVariables as $variable) {
+            if (is_string($variable)) {
+                $allPlainVariablesNames[$variable] = $variable;
+            } elseif ($variable instanceof LogicVariableData) {
+                foreach ($variable->getAllPlainVariablesNames() as $plainVariableName) {
+                    $allPlainVariablesNames[$plainVariableName] = $plainVariableName;
+                }
+            }
+        }
+
+        return $allPlainVariablesNames;
+    }
+
+    protected function parseAllVariables(string $content): array
+    {
+        $allKeys = $this->textKeysHandler->getAllKeys(
+            $this->keyGenerator,
+            $content
+        );
+
+        $allVariables = [];
+        foreach ($allKeys as $templateKey) {
+            // Logic variable with additional handlers operations
+            if ($this->logicVariableParser->isTextLogicalVariable($templateKey)) {
+                $allVariables[] = $this->logicVariableParser->parse($templateKey);
+                continue;
+            }
+
+            // Plain template variable
+            $allVariables[] = $templateKey;
+        }
+
+        return $allVariables;
     }
 }

@@ -2,15 +2,15 @@
 
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\HandlerInterface;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian\ChooseUkrainianBySonorityHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian\ChoosePrepositionBySonorityHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use PHPUnit\Framework\TestCase;
 
 class ChooseUkrainianBySonorityHandlerTest extends TestCase
 {
     public function test()
     {
-        $handler = new ChooseUkrainianBySonorityHandler();
+        $handler = new ChoosePrepositionBySonorityHandler();
 
         // If you do not set the "previous letter", it will work as the "beginning of a sentence"
         $config = ['', 'в/у'];
