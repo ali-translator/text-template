@@ -3,8 +3,8 @@
 namespace ALI\TextTemplate;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
-use ALI\TextTemplate\MessageFormat\TemplateMessageResolver;
-use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 
 class TextTemplateFactory
 {

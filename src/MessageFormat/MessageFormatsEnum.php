@@ -14,6 +14,9 @@ class MessageFormatsEnum
      * @deprecated
      */
     public const MESSAGE_FORMATTER = 'mf';
+    /**
+     * @deprecated
+     */
     public const PLURAL_TEMPLATE = 'mf';
 
     // Without parameters resolving

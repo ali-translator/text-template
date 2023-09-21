@@ -2,7 +2,7 @@
 
 namespace ALI\TextTemplate\Tests;
 
-use ALI\TextTemplate\MessageFormat\TemplateMessageResolverFactory;
+use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplatesCollection;
 use PHPUnit\Framework\TestCase;
