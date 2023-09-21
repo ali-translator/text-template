@@ -106,4 +106,24 @@ class TextTemplateMessageResolverTest extends TestCase
             "test_variable_1" => "test_variable_1"
         ], $allUsedPlainVariables);
     }
+
+    public function testLogicVariablesWithOptionsWithSpecChars()
+    {
+        $languageISO = 'uk';
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory($languageISO));
+        $templateMessageResolverFactory = new TemplateMessageResolverFactory($languageISO);
+        /** @var TextTemplateMessageResolver $templateMessageResolver */
+        $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
+
+        $templateContent = "Tom {|print('has')} {|plural(appleNumbers,'=0[no one apple] =1[one apple] other[many apples]')}";
+
+        $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
+        $this->assertEquals("Tom has no one apple", $templateMessageResolver->resolve($templateItem));
+
+        $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 1]);
+        $this->assertEquals("Tom has one apple", $templateMessageResolver->resolve($templateItem));
+
+        $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 555]);
+        $this->assertEquals("Tom has many apples", $templateMessageResolver->resolve($templateItem));
+    }
 }

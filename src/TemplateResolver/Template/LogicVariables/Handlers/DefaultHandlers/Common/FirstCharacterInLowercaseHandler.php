@@ -29,7 +29,6 @@ class FirstCharacterInLowercaseHandler implements HandlerInterface
     {
         $pipeManualData = new PipeManualData(
             true,
-            true,
             'text',
             'The text that needs its first character to be in lowercase',
             ['Hello']
@@ -41,8 +40,8 @@ class FirstCharacterInLowercaseHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Transforms the first character of the given text to lowercase',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            $pipeManualData
         );
     }
 }

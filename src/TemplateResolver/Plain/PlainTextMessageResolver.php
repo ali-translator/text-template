@@ -6,6 +6,9 @@ use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateItem;
 
+/**
+ * Used for simple static data
+ */
 class PlainTextMessageResolver implements TemplateMessageResolver
 {
     public function resolve(TextTemplateItem $templateItem): string

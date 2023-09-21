@@ -42,7 +42,6 @@ class AddLocativeSuffixHandler implements HandlerInterface
     public static function generateManual(): HandlerManualData
     {
         $pipeManualData = new PipeManualData(
-            true,
             false,
             'locative',
             'The base word to which the locative suffix should be added'
@@ -59,8 +58,8 @@ class AddLocativeSuffixHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Adds the appropriate locative suffix ("\'de" or "\'da") to the given word based on vowel harmony. Specific to the Turkish language.',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            $pipeManualData
         );
     }
 }

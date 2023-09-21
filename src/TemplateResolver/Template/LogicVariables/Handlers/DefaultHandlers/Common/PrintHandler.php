@@ -27,7 +27,6 @@ class PrintHandler implements HandlerInterface
     public static function generateManual(): HandlerManualData
     {
         $pipeManualData = new PipeManualData(
-            true,
             false,
             'text',
             'The text you want to show',
@@ -48,8 +47,8 @@ class PrintHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Print the value of "static"/"plain variable". Can be used as input to another handler function.',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            $pipeManualData
         );
     }
 }

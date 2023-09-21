@@ -5,8 +5,6 @@ namespace ALI\TextTemplate\TemplateResolver\Template;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\DefaultHandlersFacade;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
@@ -28,18 +26,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     {
         $this->keyGenerator = $keyGenerator;
         $this->textKeysHandler = new TextKeysHandler();
-
-        if (!$logicVariableHandlersRepository) {
-            $logicVariableHandlersRepository = (new DefaultHandlersFacade())->registerHandlers(
-                new HandlersRepository(),
-                null
-            );
-        }
         $this->handlersRepository = $logicVariableHandlersRepository;
-
-        if (!$logicVariableParser) {
-            $logicVariableParser = new LogicVariableParser('|');
-        }
         $this->logicVariableParser = $logicVariableParser;
     }
 

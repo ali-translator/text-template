@@ -10,26 +10,26 @@ class HandlerManualData
      */
     protected ?array $allowedLanguagesIso;
     protected string $description;
-    protected PipeManualData $pipe;
-
     /**
      * @var ArgumentManualData[]
      */
     protected array $arguments;
 
+    protected ?PipeManualData $pipe;
+
     public function __construct(
         string $alias,
         ?array $allowedLanguagesIso,
         string $description,
-        PipeManualData $pipe,
-        array $arguments
+        array $arguments,
+        ?PipeManualData $pipe
     )
     {
         $this->alias = $alias;
         $this->allowedLanguagesIso = $allowedLanguagesIso;
         $this->description = $description;
-        $this->pipe = $pipe;
         $this->arguments = $arguments;
+        $this->pipe = $pipe;
     }
 
     public function getAlias(): string
@@ -42,16 +42,16 @@ class HandlerManualData
         return $this->description;
     }
 
-    public function getPipe(): PipeManualData
-    {
-        return $this->pipe;
-    }
-
     /**
      * @var ArgumentManualData[]
      */
     public function getArguments(): array
     {
         return $this->arguments;
+    }
+
+    public function getPipe(): ?PipeManualData
+    {
+        return $this->pipe;
     }
 }

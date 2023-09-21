@@ -5,7 +5,6 @@ namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Def
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\PipeManualData;
 
 class ChoosePrepositionBySonorityHandler implements HandlerInterface
 {
@@ -39,13 +38,6 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 
     public static function generateManual(): HandlerManualData
     {
-        $pipeManualData = new PipeManualData(
-            false,
-            false,
-            null,
-            null
-        );
-
         $argumentManualData = [
             new ArgumentManualData(0, true, 'originalPreposition', 'Prepositional phrase pair. Supported values: "в/во"', ['в/во']),
             new ArgumentManualData(1, true, 'wordAfter', 'The word that comes after the preposition',[
@@ -58,8 +50,8 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Chooses the correct preposition by the sonority of the following word. Specific to the Russian language.',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            null
         );
     }
 }

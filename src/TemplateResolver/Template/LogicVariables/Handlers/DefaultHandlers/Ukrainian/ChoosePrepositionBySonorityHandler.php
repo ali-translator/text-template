@@ -5,7 +5,6 @@ namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Def
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\PipeManualData;
 
 class ChoosePrepositionBySonorityHandler implements HandlerInterface
 {
@@ -80,25 +79,21 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 
     public static function generateManual(): HandlerManualData
     {
-        $pipeManualData = new PipeManualData(
-            false,
-            false,
-            null,
-            null
-        );
-
         $argumentManualData = [
             new ArgumentManualData(0, true,
-                'lastWordOrItLastLetter', 'Last letter of the word preceding the preposition. Also accepts full word for better syntax readability.',[
+                'lastWordOrItLastLetter', 'Last letter of the word preceding the preposition. Also accepts full word for better syntax readability.',
+                [
                     'Розваги',
                     'Марш',
                 ]),
             new ArgumentManualData(1, true,
-                'originalPreposition', 'The original preposition to be chosen based on sonority.',[
+                'originalPreposition', 'The original preposition to be chosen based on sonority.',
+                [
                     'в/у'
                 ]),
             new ArgumentManualData(2, true,
-                'wordAfter', 'The word immediately following the preposition.',[
+                'wordAfter', 'The word immediately following the preposition.',
+                [
                     'Києві',
                     'Одесі',
                     'Львові',
@@ -109,8 +104,8 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Chooses the appropriate preposition ("у" or "в") based on the sonority of the preceding and following words. Specific to the Ukrainian language.',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            null
         );
     }
 }

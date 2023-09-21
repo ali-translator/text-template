@@ -29,7 +29,6 @@ class FirstCharacterInUppercaseHandler implements HandlerInterface
     {
         $pipeManualData = new PipeManualData(
             true,
-            true,
             'text',
             'The text that needs its first character to be in uppercase',
             ['hello']
@@ -41,8 +40,8 @@ class FirstCharacterInUppercaseHandler implements HandlerInterface
             static::getAlias(),
             static::getAllowedLanguagesIso(),
             'Transforms the first character of the given text to uppercase',
-            $pipeManualData,
-            $argumentManualData
+            $argumentManualData,
+            $pipeManualData
         );
     }
 }
