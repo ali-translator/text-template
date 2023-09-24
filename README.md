@@ -1,9 +1,11 @@
 # Text template
 
 ## Installation
-require php ^7.4
+
+This installation requires php ^7.4
+
 ```bash
-$ composer require ali-translator/text-template
+$ composer require ali-translator/text-template:^1
 ```
 
 ### Using
@@ -74,6 +76,10 @@ Logic Variables Handlers are the core functionalities behind the Logic Variables
 * PrintHandler
 : Prints the value of a "static"/"plain variable". Can be used as input to another handler function.
 ```{|print('Hello World')}```
+
+* HideHandler
+  : This handler is designed to acknowledge variables without displaying them in the text. This can be useful in situations where you need to ensure that all registered variables are used in the text, even if they don't visibly appear.<br>
+  ```{|hide(variable1, variable2, ...)}```
 
 * PluralHandler
 : Handles pluralization based on the given parameters and locale.<br>

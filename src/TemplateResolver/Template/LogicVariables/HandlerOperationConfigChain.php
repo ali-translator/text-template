@@ -2,6 +2,7 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exceptions\UndefinedHandlerException;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TextTemplatesCollection;
 
@@ -20,7 +21,7 @@ class HandlerOperationConfigChain
     public function run(
         TextTemplatesCollection     $variablesCollection,
         HandlersRepositoryInterface $handlersRepository
-    ): ?string
+    ): string
     {
         $previousOperationResult = '';
         foreach ($this->operationConfigs as $operationConfig) {
@@ -30,9 +31,6 @@ class HandlerOperationConfigChain
                 $operationConfig,
                 $variablesCollection
             );
-            if ($previousOperationResult === null) {
-                return null;
-            }
         }
 
         return $previousOperationResult;
@@ -43,11 +41,11 @@ class HandlerOperationConfigChain
         HandlersRepositoryInterface $operatorRepository,
         HandlerOperationConfig      $operationConfig,
         TextTemplatesCollection     $variablesCollection
-    ): ?string
+    ): string
     {
         $handler = $operatorRepository->find($operationConfig->getHandlerAlias());
         if (!$handler) {
-            return null;
+            throw new UndefinedHandlerException($operationConfig->getHandlerAlias());
         }
 
         $config = $operationConfig->resolveConfig($variablesCollection);

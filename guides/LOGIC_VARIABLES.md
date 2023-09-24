@@ -12,8 +12,8 @@ In our system, logic variables provide a dynamic way to manipulate and format te
 2. **Pipe Operator "|"**: This also serves as the "pipe" operator, similar to bash, which takes the output of one function and provides it as input to the next. You can chain as many functions as you need, in the order they should be executed.
 3. **Function Names**: After the pipe | comes the function name. This is immediately followed by its parameters enclosed in parentheses ( ).
    Parameters: Parameters can be either variables or strings.
-   Strings can be enclosed in single (') or double (") quotes: {|print('hello')|
-   Variables are not enclosed in quotes: {|print(city_name)|}. Here, city_name is treated as a variable.
+   Strings can be enclosed in single (') or double (") quotes: {|print('hello')}
+   Variables are not enclosed in quotes: {|print(city_name)}. Here, city_name is treated as a variable.
 
 #### Example:
 
@@ -23,7 +23,8 @@ Given the logic variable:
 {|print('hello')|makeFirstCharacterInUppercase}
 ```
 
-The system will first execute the print function, which outputs the string "hello". This output is then piped into the makeFirstCharacterInUppercase function, resulting in the final output:
+The system will first execute the print function, which outputs the string "hello". 
+This output is then piped into the makeFirstCharacterInUppercase function, resulting in the final output:
 
 ```
 Hello
@@ -32,15 +33,16 @@ Hello
 In another example, with a variable as an input:
 
 ```
-{|print(city_name)|}
+{|print(city_name)}
 ```
 
-This will return the value of the city_name variable.
+This will return the value of the city_name variable. (Of course, you don't need "logical variables" for normal variable output, you can just output {city_name}).
 
 
 #### Chaining Multiple Functions:
 
-Functions can be chained seamlessly. The result of each function is passed on to the next function in the chain:
+Also functions can be chained.
+The result of each function is passed on to the next function in the chain:
 
 ```
 {|function1|function2|function3|...|functionN}

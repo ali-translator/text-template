@@ -126,4 +126,21 @@ class TextTemplateMessageResolverTest extends TestCase
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 555]);
         $this->assertEquals("Tom has many apples", $templateMessageResolver->resolve($templateItem));
     }
+
+    public function testHidingParserErrors()
+    {
+        $languageISO = 'uk';
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory($languageISO));
+        $templateMessageResolverFactory = new TemplateMessageResolverFactory($languageISO);
+        /** @var TextTemplateMessageResolver $templateMessageResolver */
+        $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
+
+        $templateContent = "Tom {|('has')} {|plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}";
+        $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
+        $this->assertEquals("Tom {|('has')} {|plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}", $templateMessageResolver->resolve($templateItem));
+
+        $templateContent = "Tom {|uk_choosePrepositionBySonority()}";
+        $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
+        $this->assertEquals("Tom {|uk_choosePrepositionBySonority()}", $templateMessageResolver->resolve($templateItem));
+    }
 }

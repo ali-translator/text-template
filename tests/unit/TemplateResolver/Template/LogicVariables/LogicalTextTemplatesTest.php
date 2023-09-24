@@ -6,6 +6,7 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInUppercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\DefaultHandlersFacade;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddLocativeSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exceptions\UndefinedHandlerException;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
@@ -46,7 +47,13 @@ class LogicalTextTemplatesTest extends TestCase
         $dataForCheck = [
             'İstanbul' => '',
         ];
-        $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
+        try {
+            $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
+            $allOk = false;
+        } catch (UndefinedHandlerException $exception) {
+            $allOk = true;
+        }
+        $this->assertEquals(true, $allOk);
     }
 
     /**
@@ -59,7 +66,7 @@ class LogicalTextTemplatesTest extends TestCase
         $dataForCheck = [
             '' => "",
         ];
-        $logicVariableTemplate = '|'.AddLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
+        $logicVariableTemplate = '|'.AddLocativeSuffixHandler::getAlias() . '(city_name, "")|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 

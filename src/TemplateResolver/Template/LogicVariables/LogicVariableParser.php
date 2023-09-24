@@ -2,6 +2,8 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVariableParsingExcepting;
+
 /**
  * Parser for templates with "Logic variables" like this:
  * 'Розваги {|uk_choosePrepositionBySonority("Розваги", "в/у", city_name)} {city_name}'
@@ -17,17 +19,20 @@ class LogicVariableParser
         $this->operationDelimiter = $operationDelimiter;
     }
 
+    /**
+     * @throws LogicVariableParsingExcepting
+     */
     public function parse(string $logicVariable): LogicVariableData
     {
         $operations = explode($this->operationDelimiter, $logicVariable);
         $handlerConfigsChain = new HandlerOperationConfigChain();
 
         foreach ($operations as $operation) {
-            if (
-                !$operation
-                || !preg_match('/(?P<handler_alias>[-_a-zA-Z0-9]+)(\((?P<parameters>.*)\)$)?/', $operation, $matches)
-            ) {
+            if (!$operation) {
                 continue;
+            }
+            if (!preg_match('/(?P<handler_alias>[-_a-zA-Z0-9]+)(\((?P<parameters>.*)\)$)?/', $operation, $matches)) {
+                throw new LogicVariableParsingExcepting('Invalid syntax in "'.$operation.'" part');
             }
 
             $operationName = $matches['handler_alias'];

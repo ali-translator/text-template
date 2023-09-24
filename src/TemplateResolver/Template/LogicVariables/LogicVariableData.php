@@ -17,7 +17,7 @@ class LogicVariableData
     public function run(
         TextTemplatesCollection     $variablesCollection,
         HandlersRepositoryInterface $handlersRepository
-    ): ?string
+    ): string
     {
         return $this->operationConfigChain->run($variablesCollection, $handlersRepository);
     }

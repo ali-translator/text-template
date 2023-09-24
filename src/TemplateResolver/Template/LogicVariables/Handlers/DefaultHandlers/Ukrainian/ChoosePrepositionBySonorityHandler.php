@@ -2,6 +2,7 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Ukrainian;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exceptions\HandlerProcessingException;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
@@ -32,11 +33,18 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
     public function run(string $pipeInputText, array $config): string
     {
         $lastLetterOfPreviousWord = $config[0] ?? null;
-        $originalPreposition = $config[1] ?? null;
-        $wordAfter = $config[2] ?? null;
+        if ($lastLetterOfPreviousWord === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'First argument "lastWordOrItLastLetter" is missing');
+        }
 
-        if ($lastLetterOfPreviousWord === null || $originalPreposition === null || $wordAfter === null) {
-            return '';
+        $originalPreposition = $config[1] ?? null;
+        if ($originalPreposition === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'Second argument "originalPreposition" is missing');
+        }
+
+        $wordAfter = $config[2] ?? null;
+        if ($wordAfter === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'Third argument "wordAfter" is missing');
         }
 
         // Also accepts "full word" for better syntax reading
@@ -44,7 +52,7 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 
         $prepositionCouple = static::$prepositionCouples[$originalPreposition] ?? null;
         if (!$prepositionCouple) {
-            return $originalPreposition;
+            throw new HandlerProcessingException(static::getAlias(), 'Argument "originalPreposition" is specified as "'.$originalPreposition.'" which is not supported .Supported:' .implode(array_keys(static::$prepositionCouples)) );
         }
         $forVowel = $prepositionCouple['forVowel'];
         $forConsonant = $prepositionCouple['forConsonant'];

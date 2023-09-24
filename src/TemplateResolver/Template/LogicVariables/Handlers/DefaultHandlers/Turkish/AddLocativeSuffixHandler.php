@@ -2,6 +2,7 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exceptions\HandlerProcessingException;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
@@ -22,8 +23,8 @@ class AddLocativeSuffixHandler implements HandlerInterface
     public function run(string $pipeInputText, array $config): string
     {
         $locative = $config[0] ?? $pipeInputText;
-        if (!$locative) {
-            return '';
+        if ($locative === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'First argument "locative" is missing (the base word to which the locative suffix should be added)');
         }
         $lastVowelType = TurkishFrontAndBackVowelsHelper::getLastVowelType($locative);
         if (!$lastVowelType) {

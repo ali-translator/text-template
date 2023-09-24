@@ -2,9 +2,11 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exceptions\HandlerProcessingException;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
+use MessageFormatter;
 
 class PluralHandler implements HandlerInterface
 {
@@ -28,19 +30,28 @@ class PluralHandler implements HandlerInterface
     public function run(string $pipeInputText, array $config): string
     {
         $numberValue = $config[0] ?? null;
+        if ($numberValue === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'First argument "number" is missing');
+        }
         $templateOptions = $config[1] ?? null;
+        if ($templateOptions === null) {
+            throw new HandlerProcessingException(static::getAlias(), 'Second argument "format" is missing');
+        }
+
         $locale = $config[2] ?? $this->locale;
 
-        if ($numberValue === null || $templateOptions === null) {
-            return '';
-        }
 
         $templateOptions = str_replace(['[', ']'], ['{', '}'], $templateOptions);
 
         $template = '{numberValue, plural, ' . $templateOptions . '}';
         $parameters = ['numberValue' => $numberValue];
 
-        return \MessageFormatter::formatMessage($locale, $template, $parameters);
+        $result = MessageFormatter::formatMessage($locale, $template, $parameters);
+        if ($result === false) {
+            throw new HandlerProcessingException(static::getAlias(), 'Incorrect "plural format". See "ICU MessageFormat"');
+        }
+
+        return $result;
     }
 
     public static function generateManual(): HandlerManualData
@@ -56,14 +67,14 @@ class PluralHandler implements HandlerInterface
             new ArgumentManualData(
                 1,
                 true,
-                'text',
+                'format',
                 'The ICU MessageFormat string defining the plural forms. But instead of "{" and "}" use "[" and "]"!',
                 ["=0[no apples] =1[one apple] two[a couple of apples] few[a few apples] many[lots of apples] other[some apples]"]
             ),
             new ArgumentManualData(
                 2,
                 false,
-                'text',
+                'locale',
                 'Locale for which the plural forms are defined. Do not override this value unless specifically required!',
                 ['en', 'uk', 'tr', 'ru']
             )

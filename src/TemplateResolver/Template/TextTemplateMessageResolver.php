@@ -3,13 +3,16 @@
 namespace ALI\TextTemplate\TemplateResolver\Template;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Template\Exceptions\VariableResolvingException;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVariableParsingExcepting;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateItem;
+use Exception;
 
 class TextTemplateMessageResolver implements TemplateMessageResolver
 {
@@ -17,17 +20,21 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     private TextKeysHandler $textKeysHandler;
     private ?LogicVariableParser $logicVariableParser;
     private ?HandlersRepositoryInterface $handlersRepository;
+    // "SilentMode" will catch all parser errors and not pass them to you
+    private bool $silentMode;
 
     public function __construct(
         KeyGenerator                $keyGenerator,
         HandlersRepositoryInterface $logicVariableHandlersRepository,
-        LogicVariableParser         $logicVariableParser
+        LogicVariableParser         $logicVariableParser,
+        bool                        $silentMode = true
     )
     {
         $this->keyGenerator = $keyGenerator;
         $this->textKeysHandler = new TextKeysHandler();
         $this->handlersRepository = $logicVariableHandlersRepository;
         $this->logicVariableParser = $logicVariableParser;
+        $this->silentMode = $silentMode;
     }
 
     public function getFormatName(): string
@@ -57,12 +64,34 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
                 // Logic variable with additional handlers operations
                 if ($this->logicVariableParser->isTextLogicalVariable($variableContent)) {
-                    $logicVariableData = $this->logicVariableParser->parse($variableContent);
-                    return $logicVariableData
-                        ->run(
-                            $childTextTemplatesCollection,
-                            $this->handlersRepository
-                        );
+                    try {
+                        $logicVariableData = $this->logicVariableParser->parse($variableContent);
+                    } catch (LogicVariableParsingExcepting $excepting) {
+                        if (!$this->silentMode) {
+                            throw new VariableResolvingException($variableContent, $excepting->getMessage());
+                        }
+                    }
+
+                    if (!empty($logicVariableData)) {
+                        try {
+                            $resolvedLogicalVariable = $logicVariableData
+                                ->run(
+                                    $childTextTemplatesCollection,
+                                    $this->handlersRepository
+                                );
+                        } catch (Exception $exception) {
+                        }
+                    }
+
+                    if (!isset($resolvedLogicalVariable) && !$this->silentMode) {
+                        throw new VariableResolvingException($variableContent, $exception->getMessage());
+                    }
+
+                    return $resolvedLogicalVariable ?? null;
+                }
+
+                if (!$this->silentMode) {
+                    throw new VariableResolvingException($variableContent, 'Cannot resolve this pattern');
                 }
 
                 return null;
@@ -99,7 +128,13 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         foreach ($allKeys as $templateKey) {
             // Logic variable with additional handlers operations
             if ($this->logicVariableParser->isTextLogicalVariable($templateKey)) {
-                $allVariables[] = $this->logicVariableParser->parse($templateKey);
+                try {
+                    $allVariables[] = $this->logicVariableParser->parse($templateKey);
+                } catch (LogicVariableParsingExcepting $excepting) {
+                    if (!$this->silentMode) {
+                        throw new VariableResolvingException($templateKey, $excepting->getMessage());
+                    }
+                }
                 continue;
             }
 

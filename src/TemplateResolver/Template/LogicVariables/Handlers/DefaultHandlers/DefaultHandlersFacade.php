@@ -4,6 +4,7 @@ namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Def
 
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInLowercaseHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\FirstCharacterInUppercaseHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\HideHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PluralHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PrintHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
@@ -13,6 +14,7 @@ class DefaultHandlersFacade
 {
     static array $allDefaultHandlersClasses = [
         PrintHandler::class,
+        HideHandler::class,
         FirstCharacterInLowercaseHandler::class,
         FirstCharacterInUppercaseHandler::class,
         PluralHandler::class,
