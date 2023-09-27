@@ -52,7 +52,12 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 
         $prepositionCouple = static::$prepositionCouples[$originalPreposition] ?? null;
         if (!$prepositionCouple) {
-            throw new HandlerProcessingException(static::getAlias(), 'Argument "originalPreposition" is specified as "'.$originalPreposition.'" which is not supported .Supported:' .implode(array_keys(static::$prepositionCouples)) );
+            throw new HandlerProcessingException(
+                static::getAlias(),
+                'Argument "originalPreposition" is specified as "' . $originalPreposition . '" which is not supported .Supported: ' . implode(", ", array_map(function ($value) {
+                    return '"' . $value . '"';
+                }, array_keys(static::$prepositionCouples)))
+            );
         }
         $forVowel = $prepositionCouple['forVowel'];
         $forConsonant = $prepositionCouple['forConsonant'];

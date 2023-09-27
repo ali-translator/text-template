@@ -31,11 +31,15 @@ class PluralHandler implements HandlerInterface
     {
         $numberValue = $config[0] ?? null;
         if ($numberValue === null) {
-            throw new HandlerProcessingException(static::getAlias(), 'First argument "number" is missing');
+            throw new HandlerProcessingException(static::getAlias(), 'First argument "numberForPluralForm" is missing');
         }
+        if (!is_numeric($numberValue)) {
+            throw new HandlerProcessingException(static::getAlias(), 'The first argument named "numberForPluralForm" must be numeric. The value "' . $numberValue . '" is provided');
+        }
+
         $templateOptions = $config[1] ?? null;
         if ($templateOptions === null) {
-            throw new HandlerProcessingException(static::getAlias(), 'Second argument "format" is missing');
+            throw new HandlerProcessingException(static::getAlias(), 'Second argument "messageFormat" is missing');
         }
 
         $locale = $config[2] ?? $this->locale;
@@ -48,7 +52,7 @@ class PluralHandler implements HandlerInterface
 
         $result = MessageFormatter::formatMessage($locale, $template, $parameters);
         if ($result === false) {
-            throw new HandlerProcessingException(static::getAlias(), 'Incorrect "plural format". See "ICU MessageFormat"');
+            throw new HandlerProcessingException(static::getAlias(), 'Incorrect syntax of "messageFormat" argument. See the manual for this handler');
         }
 
         return $result;
@@ -60,16 +64,16 @@ class PluralHandler implements HandlerInterface
             new ArgumentManualData(
                 0,
                 true,
-                'number',
+                'numberForPluralForm',
                 'The number value you want to use for plural formatting.',
                 ['5', '1', '0']
             ),
             new ArgumentManualData(
                 1,
                 true,
-                'format',
+                'messageFormat',
                 'The ICU MessageFormat string defining the plural forms. But instead of "{" and "}" use "[" and "]"!',
-                ["=0[no apples] =1[one apple] two[a couple of apples] few[a few apples] many[lots of apples] other[some apples]"]
+                ["=0[no apples] =1[one apple] two[a couple of apples] few[a few apples] many[lots of apples] other[# apples]"]
             ),
             new ArgumentManualData(
                 2,

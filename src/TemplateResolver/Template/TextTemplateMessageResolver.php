@@ -91,7 +91,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 }
 
                 if (!$this->silentMode) {
-                    throw new VariableResolvingException($variableContent, 'Cannot resolve this pattern');
+                    throw new VariableResolvingException($variableContent, 'Undefined variable');
                 }
 
                 return null;

@@ -46,7 +46,7 @@ class PrintHandler implements HandlerInterface
         return new HandlerManualData(
             static::getAlias(),
             static::getAllowedLanguagesIso(),
-            'Print the value of "static"/"plain variable". Can be used as input to another handler function.',
+            'Print the value of "static"/"plain variable". Can be used as input to another handler function by "PIPE" operator.',
             $argumentManualData,
             $pipeManualData
         );

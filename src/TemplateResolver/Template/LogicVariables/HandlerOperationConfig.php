@@ -2,6 +2,7 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\HandlerArgumentUndefinedVariableExcepting;
 use ALI\TextTemplate\TextTemplatesCollection;
 
 class HandlerOperationConfig
@@ -31,7 +32,7 @@ class HandlerOperationConfig
                 if ($templateItem) {
                     $config[$key] = $templateItem->resolve();
                 } else {
-                    $config[$key] = null;
+                    throw new HandlerArgumentUndefinedVariableExcepting($value['value'], $key + 1);
                 }
             } else {
                 $config[$key] = $value;

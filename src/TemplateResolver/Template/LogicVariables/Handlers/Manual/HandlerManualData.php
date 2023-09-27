@@ -54,4 +54,24 @@ class HandlerManualData
     {
         return $this->pipe;
     }
+
+    public function getAllowedLanguagesIso(): ?array
+    {
+        return $this->allowedLanguagesIso;
+    }
+
+    public function generateExample(): string
+    {
+        $arguments = [];
+        foreach ($this->getArguments() as $argumentManual) {
+            if ($argumentManual->getExampleValues()) {
+                $argument = current($argumentManual->getExampleValues());
+            } else {
+                $argument = '...';
+            }
+            $arguments[$argumentManual->getPosition()] = '"' . $argument . '"';
+        }
+
+        return $this->getAlias() . '(' . implode(', ', $arguments) . ')';
+    }
 }

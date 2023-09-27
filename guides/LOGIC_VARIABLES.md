@@ -45,7 +45,7 @@ Also functions can be chained.
 The result of each function is passed on to the next function in the chain:
 
 ```
-{|function1|function2|function3|...|functionN}
+{|function1()|function2()|function3()|...|functionN()}
 ```
 
 With each pipe, the output is transformed step by step until the final result is achieved.

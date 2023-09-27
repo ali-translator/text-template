@@ -24,15 +24,20 @@ class TemplateMessageResolverFactory
     protected TextKeysHandler $textKeysHandler;
     protected ?HandlersRepositoryInterface $handlersRepository;
 
+    // "SilentMode" will catch all parser errors and not pass them to you
+    private bool $silentMode;
+
     public function __construct(
         string        $locale,
         ?KeyGenerator $keyGenerator = null,
         ?HandlersRepositoryInterface $logicVariableHandlersRepository = null,
-        ?LogicVariableParser $logicVariableParser = null
+        ?LogicVariableParser $logicVariableParser = null,
+        bool $silentMode = true
     )
     {
         $this->locale = $locale;
         $this->keyGenerator = $keyGenerator ?: new StaticKeyGenerator('{', '}');
+        $this->silentMode = $silentMode;
 
         // Services for "TEXT_TEMPLATE"
         $this->textKeysHandler = new TextKeysHandler();
@@ -62,7 +67,8 @@ class TemplateMessageResolverFactory
                 $templateMessageResolver = new TextTemplateMessageResolver(
                     $this->keyGenerator,
                     $this->handlersRepository,
-                    $this->logicVariableParser
+                    $this->logicVariableParser,
+                    $this->silentMode
                 );
                 break;
             case MessageFormatsEnum::MESSAGE_FORMATTER:

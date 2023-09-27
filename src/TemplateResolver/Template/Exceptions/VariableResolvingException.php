@@ -17,7 +17,7 @@ class VariableResolvingException extends RuntimeException
     {
         $this->variableContent = $variableContent;
 
-        parent::__construct($this->variableContent . ': ' . $$message, 0, $previous);
+        parent::__construct('Variable content "' . $this->variableContent . '": ' . $message, 0, $previous);
     }
 
     public function getVariableContent(): string
