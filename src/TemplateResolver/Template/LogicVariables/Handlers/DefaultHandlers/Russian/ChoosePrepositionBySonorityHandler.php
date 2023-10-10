@@ -11,7 +11,7 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 {
     public static function getAlias(): string
     {
-        return 'ru_choosePrepositionBySonority';
+        return 'ru_choosePreposition';
     }
 
     public static function getAllowedLanguagesIso(): ?array

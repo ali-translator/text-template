@@ -6,7 +6,7 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVa
 
 /**
  * Parser for templates with "Logic variables" like this:
- * 'Розваги {|uk_choosePrepositionBySonority("Розваги", "в/у", city_name)} {city_name}'
+ * 'Розваги {|uk_choosePreposition("Розваги", "в/у", city_name)} {city_name}'
  */
 class LogicVariableParser
 {

@@ -95,7 +95,7 @@ Logic Variables Handlers are the core functionalities behind the Logic Variables
 
 * ChoosePrepositionBySonorityHandler (Russian)
 : Determines the correct preposition for the given word in Russian.<br>
-```Поездка {|ru_choosePrepositionBySonority('во/в', 'Львов')} Львов```
+```Поездка {|ru_choosePreposition('во/в', 'Львов')} Львов```
 
 * AddLocativeSuffixHandler (Turkish)
 : Appends the correct locative suffix to a given word in Turkish.<br>
@@ -103,7 +103,7 @@ Logic Variables Handlers are the core functionalities behind the Logic Variables
 
 * ChoosePrepositionBySonorityHandler (Ukrainian)
 : Determines the correct preposition for the given word in Ukrainian.<br>
-```Поїздка {|uk_choosePrepositionBySonority('Поїздка', 'в/у', 'Львів')} Львів```
+```Поїздка {|uk_choosePreposition('Поїздка', 'в/у', 'Львів')} Львів```
 
 ### Tests
 ```bash

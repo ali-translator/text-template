@@ -78,7 +78,7 @@ class TextTemplateMessageResolverTest extends TestCase
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('uk'));
 
         // Check logic variables with parameters
-        $templateContent = 'Розваги {|uk_choosePrepositionBySonority("Розваги", "в/у", city_name)} {city_name}';
+        $templateContent = 'Розваги {|uk_choosePreposition("Розваги", "в/у", city_name)} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
@@ -139,8 +139,8 @@ class TextTemplateMessageResolverTest extends TestCase
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
         $this->assertEquals("Tom {|('has')} {|plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}", $templateMessageResolver->resolve($templateItem));
 
-        $templateContent = "Tom {|uk_choosePrepositionBySonority()}";
+        $templateContent = "Tom {|uk_choosePreposition()}";
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
-        $this->assertEquals("Tom {|uk_choosePrepositionBySonority()}", $templateMessageResolver->resolve($templateItem));
+        $this->assertEquals("Tom {|uk_choosePreposition()}", $templateMessageResolver->resolve($templateItem));
     }
 }

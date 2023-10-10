@@ -38,7 +38,7 @@ class LogicalTextTemplatesTest extends TestCase
         );
 
         // Correct resolving
-        $logicVariableTemplate = '|uk_choosePrepositionBySonority("Розваги","в/у", city_name)';
+        $logicVariableTemplate = '|uk_choosePreposition("Розваги","в/у", city_name)';
         $dataForCheck = ['Києві' => 'в'];
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
 
@@ -72,7 +72,7 @@ class LogicalTextTemplatesTest extends TestCase
 
     protected function checkHandlerWithParameters(LogicVariableParser $logicVariableParser, HandlersRepositoryInterface $handlersRepository): void
     {
-        $logicVariableTemplate = '|uk_choosePrepositionBySonority("и","в/у", city_name)';
+        $logicVariableTemplate = '|uk_choosePreposition("и","в/у", city_name)';
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',

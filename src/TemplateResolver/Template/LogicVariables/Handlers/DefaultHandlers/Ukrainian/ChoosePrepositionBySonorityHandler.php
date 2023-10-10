@@ -11,7 +11,7 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
 {
     public static function getAlias(): string
     {
-        return 'uk_choosePrepositionBySonority';
+        return 'uk_choosePreposition';
     }
 
     public static function getAllowedLanguagesIso(): ?array
@@ -48,7 +48,7 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
         }
 
         // Also accepts "full word" for better syntax reading
-        $lastLetterOfPreviousWord = mb_substr($lastLetterOfPreviousWord, -1, 1);
+        $lastLetterOfPreviousWord = mb_substr(trim($lastLetterOfPreviousWord), -1, 1);
 
         $prepositionCouple = static::$prepositionCouples[$originalPreposition] ?? null;
         if (!$prepositionCouple) {
