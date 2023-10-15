@@ -11,7 +11,7 @@ use MessageFormatter;
  * Templates like:
  * 'Tom has {appleNumbers, plural, =0{no one apple}=1{one apple}other{many apples}}'
  *
- * @deprecated use instead "PluralHandler" in "default template": "Tom has {|plural(appleNumbers,'=0[no one apple] =1[one apple] other[many apples]')}"
+ * @deprecated use instead "PluralHandler" in "default template": "Tom has {plural(appleNumbers,'=0[no one apple] =1[one apple] other[many apples]')}"
  */
 class PluralTemplateMessageResolver implements TemplateMessageResolver
 {

@@ -18,7 +18,7 @@ class LogicalTextTemplatesTest extends TestCase
 {
     public function test()
     {
-        $logicVariableParser = new LogicVariableParser('|');
+        $logicVariableParser = new LogicVariableParser();
         $handlersRepository = (new DefaultHandlersFacade())->registerHandlers(
             new HandlersRepository(),
             null
@@ -31,14 +31,14 @@ class LogicalTextTemplatesTest extends TestCase
 
     public function testHandlerWithSpecificLanguage()
     {
-        $logicVariableParser = new LogicVariableParser('|');
+        $logicVariableParser = new LogicVariableParser();
         $handlersRepository = (new DefaultHandlersFacade())->registerHandlers(
             new HandlersRepository(),
             ['uk']
         );
 
         // Correct resolving
-        $logicVariableTemplate = '|uk_choosePreposition("Розваги","в/у", city_name)';
+        $logicVariableTemplate = 'uk_choosePreposition("Розваги","в/у", city_name)';
         $dataForCheck = ['Києві' => 'в'];
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
 
@@ -66,13 +66,13 @@ class LogicalTextTemplatesTest extends TestCase
         $dataForCheck = [
             '' => "",
         ];
-        $logicVariableTemplate = '|'.AddLocativeSuffixHandler::getAlias() . '(city_name, "")|' . FirstCharacterInUppercaseHandler::getAlias() . '|' . FirstCharacterInLowercaseHandler::getAlias();
+        $logicVariableTemplate = AddLocativeSuffixHandler::getAlias() . '(city_name, "")|' . FirstCharacterInUppercaseHandler::getAlias() . '()|' . FirstCharacterInLowercaseHandler::getAlias().'()';
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 
     protected function checkHandlerWithParameters(LogicVariableParser $logicVariableParser, HandlersRepositoryInterface $handlersRepository): void
     {
-        $logicVariableTemplate = '|uk_choosePreposition("и","в/у", city_name)';
+        $logicVariableTemplate = 'uk_choosePreposition("и","в/у", city_name)';
         $dataForCheck = [
             'Києві' => 'в',
             'Одесі' => 'в',
@@ -93,7 +93,7 @@ class LogicalTextTemplatesTest extends TestCase
             'İstanbul' => "İstanbul'da",
             'düzce' => "Düzce'de",
         ];
-        $logicVariableTemplate = '|' . AddLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias();
+        $logicVariableTemplate = AddLocativeSuffixHandler::getAlias() . '(city_name)|' . FirstCharacterInUppercaseHandler::getAlias() .'()';
         $this->check($dataForCheck, $logicVariableParser, $logicVariableTemplate, $handlersRepository);
     }
 

@@ -65,11 +65,11 @@ class TextTemplateMessageResolverTest extends TestCase
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('tr'));
 
         // Template without "variable values"
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}', []);
-        $this->assertEquals("Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase}", $textTemplate->resolve());
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase()}', []);
+        $this->assertEquals("Hello {user_name} from {tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase()}", $textTemplate->resolve());
 
         // Mixing variables types
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {|tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase} and {|print(city_name)|makeFirstCharacterInLowercase}', [
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase()} and {|print(city_name)|makeFirstCharacterInLowercase()}', [
             'user_name' => 'Tom',
             'city_name' => 'i̇stanbul',
         ]);
@@ -78,18 +78,18 @@ class TextTemplateMessageResolverTest extends TestCase
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('uk'));
 
         // Check logic variables with parameters
-        $templateContent = 'Розваги {|uk_choosePreposition("Розваги", "в/у", city_name)} {city_name}';
+        $templateContent = 'Розваги {uk_choosePreposition("Розваги", "в/у", city_name)} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
         $this->assertEquals("Розваги в Києві", $textTemplate->resolve());
 
         // Check undefined logic variable
-        $templateContent = 'Розваги {|some_undefined_variable("123")} {city_name}';
+        $templateContent = 'Розваги {some_undefined_variable("123")} {city_name}';
         $textTemplate = $textTemplateFactory->create($templateContent, [
             'city_name' => 'Києві',
         ]);
-        $this->assertEquals('Розваги {|some_undefined_variable("123")} Києві', $textTemplate->resolve());
+        $this->assertEquals('Розваги {some_undefined_variable("123")} Києві', $textTemplate->resolve());
     }
 
     public function testGetAllUsedPlainVariables()
@@ -98,7 +98,7 @@ class TextTemplateMessageResolverTest extends TestCase
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
 
-        $content = 'Розваги {|some_undefined_variable("123",test_variable)} {|print(city_name)|makeFirstCharacterInLowercase} {test_variable_1}';
+        $content = 'Розваги {some_undefined_function("123",test_variable)} {print(city_name)|makeFirstCharacterInLowercase()} {test_variable_1}';
         $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content);
         $this->assertEquals([
             "test_variable" => "test_variable",
@@ -115,7 +115,7 @@ class TextTemplateMessageResolverTest extends TestCase
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
 
-        $templateContent = "Tom {|print('has')} {|plural(appleNumbers,'=0[no one apple] =1[one apple] other[many apples]')}";
+        $templateContent = "Tom {print('has')} {plural(appleNumbers,'=0[no one apple] =1[one apple] other[many apples]')}";
 
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
         $this->assertEquals("Tom has no one apple", $templateMessageResolver->resolve($templateItem));
@@ -135,12 +135,12 @@ class TextTemplateMessageResolverTest extends TestCase
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
 
-        $templateContent = "Tom {|('has')} {|plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}";
+        $templateContent = "Tom {('has')} {plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}";
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
-        $this->assertEquals("Tom {|('has')} {|plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}", $templateMessageResolver->resolve($templateItem));
+        $this->assertEquals("Tom {('has')} {plural(appleNumbers,'=0[no one appleg *sa =1[one apple] other[many apples]')}", $templateMessageResolver->resolve($templateItem));
 
-        $templateContent = "Tom {|uk_choosePreposition()}";
+        $templateContent = "Tom {uk_choosePreposition()}";
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
-        $this->assertEquals("Tom {|uk_choosePreposition()}", $templateMessageResolver->resolve($templateItem));
+        $this->assertEquals("Tom {uk_choosePreposition()}", $templateMessageResolver->resolve($templateItem));
     }
 }
