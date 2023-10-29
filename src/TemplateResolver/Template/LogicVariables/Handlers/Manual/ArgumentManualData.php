@@ -8,6 +8,7 @@ class ArgumentManualData
     protected bool $isRequired;
     protected ?string $name;
     protected ?string $description;
+    protected ?string $defaultValue;
     protected array $exampleValues;
 
     public function __construct(
@@ -15,6 +16,7 @@ class ArgumentManualData
         bool $isRequired,
         ?string $name,
         ?string $description,
+        ?string $defaultValue,
         array $exampleValues = []
     )
     {
@@ -22,6 +24,7 @@ class ArgumentManualData
         $this->isRequired = $isRequired;
         $this->name = $name;
         $this->description = $description;
+        $this->defaultValue = $defaultValue;
         $this->exampleValues = $exampleValues;
     }
 
@@ -43,6 +46,11 @@ class ArgumentManualData
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getDefaultValue(): ?string
+    {
+        return $this->defaultValue;
     }
 
     /**

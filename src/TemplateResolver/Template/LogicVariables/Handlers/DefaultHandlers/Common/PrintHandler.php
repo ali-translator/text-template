@@ -39,6 +39,7 @@ class PrintHandler implements HandlerInterface
                 false,
                 'text',
                 'The text you want to show',
+                null,
                 ['Hello']
             )
         ];

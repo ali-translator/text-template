@@ -46,8 +46,8 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
     public static function generateManual(): HandlerManualData
     {
         $argumentManualData = [
-            new ArgumentManualData(0, true, 'originalPreposition', 'Prepositional phrase pair. Supported values: "в/во"', ['в/во']),
-            new ArgumentManualData(1, true, 'wordAfter', 'The word that comes after the preposition',[
+            new ArgumentManualData(0, true, 'originalPreposition', 'Prepositional phrase pair. Supported values: "в/во"', null, ['в/во']),
+            new ArgumentManualData(1, true, 'wordAfter', 'The word that comes after the preposition', null,[
                 'Львов',
                 'Киев',
             ])

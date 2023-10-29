@@ -7,7 +7,6 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Exception
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\ArgumentManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\PipeManualData;
 
 class AddDirectionalSuffixHandler implements HandlerInterface
 {
@@ -30,14 +29,16 @@ class AddDirectionalSuffixHandler implements HandlerInterface
 
     public function run(string $pipeInputText, array $config): string
     {
-        $directional = $config[0] ?? $pipeInputText;
+        $directional = $config[0] ?? null;
+
         if ($directional === null) {
             throw new HandlerProcessingException(static::getAlias(), 'First argument "directional" is missing (the base word to which the directional suffix should be added)');
         }
 
         $suffix = $this->directionalSuffixChooser->choose($directional);
         if ($suffix) {
-            $directional .= "'" . $suffix;
+            $separator = $config[1] ?? "'";
+            $directional .= $separator . $suffix;
         }
 
         return $directional;
@@ -45,17 +46,15 @@ class AddDirectionalSuffixHandler implements HandlerInterface
 
     public static function generateManual(): HandlerManualData
     {
-        $pipeManualData = new PipeManualData(
-            false,
-            'directional',
-            'The base word to which the directional suffix should be added'
-        );
-
         $argumentManualData = [
-            new ArgumentManualData(0, false, 'directional', 'The base word to which the directional suffix should be added', [
-                'Ev',
-                'Okul'
-            ])
+            new ArgumentManualData(0, true, 'directional', 'The base word to which the directional suffix should be added',
+                null,
+                ['Ev', 'İstanbul']
+            ),
+            new ArgumentManualData(1, false, 'separator', 'If you need a separator (apostrophe) between the word and the suffix, specify it in this parameter',
+                "'",
+                ["'", '']
+            )
         ];
 
         return new HandlerManualData(
@@ -63,7 +62,7 @@ class AddDirectionalSuffixHandler implements HandlerInterface
             static::getAllowedLanguagesIso(),
             'Adds the appropriate directional suffix ("\'a", "\'e", "\'ya", "\'ye") to the given word based on vowel harmony. Specific to the Turkish language.',
             $argumentManualData,
-            $pipeManualData
+            null
         );
     }
 }

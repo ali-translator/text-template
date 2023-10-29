@@ -17,16 +17,23 @@ class AddTurkishLocativeSuffixHandlerTest extends TestCase
             'İstanbul' => "İstanbul'da",
             'Düzce' => "Düzce'de",
         ];
-        $this->check($dataForCheck, $handler);
+        $this->check($dataForCheck, $handler, null);
+
+        $dataForCheck = [
+            'Araba' => "Arabada",
+            'Kale' => "Kalede",
+        ];
+        $this->check($dataForCheck, $handler, '');
     }
 
     protected function check(
         array            $dataForCheck,
-        HandlerInterface $handler
+        HandlerInterface $handler,
+        ?string $separator
     ): void
     {
         foreach ($dataForCheck as $inputText => $correctResolvedText) {
-            $this->assertEquals($correctResolvedText, $handler->run($inputText, []));
+            $this->assertEquals($correctResolvedText, $handler->run('', [$inputText, $separator]));
         }
     }
 }

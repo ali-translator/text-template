@@ -42,6 +42,7 @@ class HideHandler implements HandlerInterface
                 true,
                 'text',
                 'Variable you wish to acknowledge without displaying',
+                null,
                 ['hiddenText']
             )
         ];

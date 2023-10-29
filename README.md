@@ -103,7 +103,9 @@ Handlers are the core functionalities behind the Functions Syntax. They offer th
 
 * AddDirectionalSuffixHandler (Turkish)
 : Adds the appropriate directional suffix ("\'a", "\'e", "\'ya", "\'ye") to the given word based on vowel harmony.<br>
-```{tr_addDirectionalSuffix('Kale')}``` -> ```Kale'ye```
+```{tr_addDirectionalSuffix('İstanbul')}``` -> ```İstanbul'a``` <br>
+: Without apostrophe: <br>
+```{tr_addDirectionalSuffix('Ev', '')}``` -> ```Eve```
 
 * ChoosePrepositionBySonorityHandler (Ukrainian)
 : Determines the correct preposition for the given word in Ukrainian.<br>

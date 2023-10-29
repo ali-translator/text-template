@@ -66,6 +66,7 @@ class PluralHandler implements HandlerInterface
                 true,
                 'numberForPluralForm',
                 'The number value you want to use for plural formatting.',
+                null,
                 ['5', '1', '0']
             ),
             new ArgumentManualData(
@@ -73,6 +74,7 @@ class PluralHandler implements HandlerInterface
                 true,
                 'messageFormat',
                 'The ICU MessageFormat string defining the plural forms. But instead of "{" and "}" use "[" and "]"!',
+                null,
                 ["=0[no apples] =1[one apple] two[a couple of apples] few[a few apples] many[lots of apples] other[# apples]"]
             ),
             new ArgumentManualData(
@@ -80,6 +82,7 @@ class PluralHandler implements HandlerInterface
                 false,
                 'locale',
                 'Locale for which the plural forms are defined. Do not override this value unless specifically required!',
+                'current language ISO',
                 ['en', 'uk', 'tr', 'ru']
             )
         ];

@@ -95,22 +95,19 @@ class ChoosePrepositionBySonorityHandler implements HandlerInterface
         $argumentManualData = [
             new ArgumentManualData(0, true,
                 'lastWordOrItLastLetter', 'Last letter of the word preceding the preposition. Also accepts full word for better syntax readability.',
-                [
-                    'Розваги',
-                    'Марш',
-                ]),
+                null,
+                ['Розваги', 'Марш']
+            ),
             new ArgumentManualData(1, true,
                 'originalPreposition', 'The original preposition to be chosen based on sonority.',
-                [
-                    'в/у'
-                ]),
+                null,
+                ['в/у']
+            ),
             new ArgumentManualData(2, true,
                 'wordAfter', 'The word immediately following the preposition.',
-                [
-                    'Києві',
-                    'Одесі',
-                    'Львові',
-                ])
+                null,
+                ['Києві', 'Одесі', 'Львові']
+            )
         ];
 
         return new HandlerManualData(

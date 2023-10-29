@@ -37,7 +37,12 @@ class AddLocativeSuffixHandler implements HandlerInterface
 
         $suffix = $this->locativeSuffixChooser->choose($locative);
 
-        return $locative . (string)$suffix;
+        if ($suffix) {
+            $separator = $config[1] ?? "'";
+            $locative .= $separator . $suffix;
+        }
+
+        return $locative;
     }
 
     public static function generateManual(): HandlerManualData
@@ -49,10 +54,14 @@ class AddLocativeSuffixHandler implements HandlerInterface
         );
 
         $argumentManualData = [
-            new ArgumentManualData(0, false, 'locative', 'The base word to which the locative suffix should be added',[
-                'İstanbul',
-                'Yalova'
-            ])
+            new ArgumentManualData(0, false, 'locative', 'The base word to which the locative suffix should be added',
+                null,
+                ['İstanbul', 'Yalova']
+            ),
+            new ArgumentManualData(1, false, 'separator', 'If you need a separator (apostrophe) between the word and the suffix, specify it in this parameter',
+                "'",
+                ["'", '']
+            )
         ];
 
         return new HandlerManualData(

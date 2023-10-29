@@ -12,9 +12,9 @@ class LocativeSuffixChooser
         }
 
         if ($lastVowelType === TurkishFrontAndBackVowelsHelper::FRONT) {
-            return "'de";
+            return "de";
         }
 
-        return "'da";
+        return "da";
     }
 }

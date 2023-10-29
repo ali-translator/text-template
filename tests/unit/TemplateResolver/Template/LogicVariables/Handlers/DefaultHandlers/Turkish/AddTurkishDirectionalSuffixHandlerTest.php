@@ -13,23 +13,36 @@ class AddTurkishDirectionalSuffixHandlerTest extends TestCase
     {
         $handler = new AddDirectionalSuffixHandler(new DirectionalSuffixChooser());
 
+        // Without apostrophe
         $dataForCheck = [
-            'Ev' => "Ev'e",
-            'Okul' => "Okul'a",
-            'Kale' => "Kale'ye",
-            'Bahçe' => "Bahçe'ye",
-            'Kitap' => "Kitap'a"
+            'Ev' => "Eve",
+            'Okul' => "Okula",
+            'Kale' => "Kaleye",
+            'Bahçe' => "Bahçeye",
+            'Kitap' => "Kitapa",
         ];
-        $this->check($dataForCheck, $handler);
+        $this->check($dataForCheck, $handler, '');
+
+        // With Apostrophe
+        $dataForCheck = [
+            'İstanbul' => "İstanbul'a",
+            'Düzce' => "Düzce'ye",
+            'Yalova' => "Yalova'ya"
+        ];
+        $this->check($dataForCheck, $handler, null);
     }
 
     protected function check(
         array            $dataForCheck,
-        HandlerInterface $handler
+        HandlerInterface $handler,
+        ?string $separator
     ): void
     {
         foreach ($dataForCheck as $inputText => $correctResolvedText) {
-            $this->assertEquals($correctResolvedText, $handler->run($inputText, []));
+            $this->assertEquals($correctResolvedText, $handler->run('', [
+                $inputText,
+                $separator
+            ]));
         }
     }
 }
