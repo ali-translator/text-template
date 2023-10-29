@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish;
+namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services;
 
 class TurkishFrontAndBackVowelsHelper
 {
@@ -30,6 +30,7 @@ class TurkishFrontAndBackVowelsHelper
     public static function getLastVowel(string $word): ?string
     {
         foreach (array_reverse(mb_str_split($word)) as $character) {
+            $character = mb_strtolower($character);
             if (static::isCharacterIsVowel($character)) {
                 return $character;
             }

@@ -21,7 +21,7 @@ class TextTemplatesCollection implements IteratorAggregate
 
     /**
      * Add a textTemplate to collection and get its key to insert into the text
-     * (after translate we replace this key two content)
+     * (after translate we replace this key to content)
      */
     public function add(
         TextTemplateItem $textTemplate,
@@ -32,7 +32,7 @@ class TextTemplatesCollection implements IteratorAggregate
 
         $templateIdHash = $textTemplate->getIdHash();
         if (empty($templateId) && $isSimpleText && isset($this->indexedSimplyTexts[$templateIdHash])) {
-            // If this text already exist and its without parameters - return old key
+            // If this text already exists and its without parameters - return old key
             $templateId = $this->indexedSimplyTexts[$templateIdHash];
         } else {
             // Adding new unique content

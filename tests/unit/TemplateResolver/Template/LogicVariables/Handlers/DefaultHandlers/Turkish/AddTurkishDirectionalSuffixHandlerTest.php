@@ -2,20 +2,23 @@
 
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish;
 
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddLocativeSuffixHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\LocativeSuffixChooser;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddDirectionalSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\DirectionalSuffixChooser;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use PHPUnit\Framework\TestCase;
 
-class AddTurkishLocativeSuffixHandlerTest extends TestCase
+class AddTurkishDirectionalSuffixHandlerTest extends TestCase
 {
     public function test()
     {
-        $handler = new AddLocativeSuffixHandler(new LocativeSuffixChooser());
+        $handler = new AddDirectionalSuffixHandler(new DirectionalSuffixChooser());
 
         $dataForCheck = [
-            'İstanbul' => "İstanbul'da",
-            'Düzce' => "Düzce'de",
+            'Ev' => "Ev'e",
+            'Okul' => "Okul'a",
+            'Kale' => "Kale'ye",
+            'Bahçe' => "Bahçe'ye",
+            'Kitap' => "Kitap'a"
         ];
         $this->check($dataForCheck, $handler);
     }

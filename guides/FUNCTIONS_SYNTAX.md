@@ -4,7 +4,7 @@ In our system, Functions provide a dynamic way to manipulate and format text. Th
 
 #### Basic Syntax:
 
-```{|functionName(some_variable_name, 'some static text')|anotherFunctionWithoutArguments()}```
+```{functionName(some_variable_name, 'some static text')|anotherFunctionWithoutArguments()}```
 
 #### Breaking it down:
 

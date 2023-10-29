@@ -7,6 +7,12 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\HideHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PluralHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PrintHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddDirectionalSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddLocativeSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\ChooseDirectionalSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\ChooseLocativeSuffixHandler;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\DirectionalSuffixChooser;
+use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\LocativeSuffixChooser;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 
@@ -18,7 +24,10 @@ class DefaultHandlersFacade
         FirstCharacterInLowercaseHandler::class,
         FirstCharacterInUppercaseHandler::class,
         PluralHandler::class,
+        Turkish\AddDirectionalSuffixHandler::class,
+        Turkish\ChooseDirectionalSuffixHandler::class,
         Turkish\AddLocativeSuffixHandler::class,
+        Turkish\ChooseLocativeSuffixHandler::class,
         Ukrainian\ChoosePrepositionBySonorityHandler::class,
         Russian\ChoosePrepositionBySonorityHandler::class,
     ];
@@ -62,6 +71,18 @@ class DefaultHandlersFacade
             }
 
             switch ($handlerClassName) {
+                case AddDirectionalSuffixHandler::class:
+                    $handlers[] = new AddDirectionalSuffixHandler(new DirectionalSuffixChooser());
+                    break;
+                case ChooseDirectionalSuffixHandler::class:
+                    $handlers[] = new ChooseDirectionalSuffixHandler(new DirectionalSuffixChooser());
+                    break;
+                case AddLocativeSuffixHandler::class:
+                    $handlers[] = new AddLocativeSuffixHandler(new LocativeSuffixChooser());
+                    break;
+                case ChooseLocativeSuffixHandler::class:
+                    $handlers[] = new ChooseLocativeSuffixHandler(new LocativeSuffixChooser());
+                    break;
                 case PluralHandler::class:
                     $handlers[] = new PluralHandler($forLanguagesISO ? current($forLanguagesISO) : 'en');
                     break;

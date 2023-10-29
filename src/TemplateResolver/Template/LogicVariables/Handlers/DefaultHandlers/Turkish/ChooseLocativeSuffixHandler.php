@@ -9,7 +9,7 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\Ar
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\HandlerManualData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\Manual\PipeManualData;
 
-class AddLocativeSuffixHandler implements HandlerInterface
+class ChooseLocativeSuffixHandler implements HandlerInterface
 {
     protected LocativeSuffixChooser $locativeSuffixChooser;
 
@@ -20,7 +20,7 @@ class AddLocativeSuffixHandler implements HandlerInterface
 
     public static function getAlias(): string
     {
-        return 'tr_addLocativeSuffix';
+        return 'tr_chooseLocativeSuffix';
     }
 
     public static function getAllowedLanguagesIso(): ?array
@@ -32,12 +32,12 @@ class AddLocativeSuffixHandler implements HandlerInterface
     {
         $locative = $config[0] ?? $pipeInputText;
         if ($locative === null) {
-            throw new HandlerProcessingException(static::getAlias(), 'First argument "locative" is missing (the base word to which the locative suffix should be added)');
+            throw new HandlerProcessingException(static::getAlias(), 'First argument "locative" is missing (the main word for which you should choose a locative suffix)');
         }
 
         $suffix = $this->locativeSuffixChooser->choose($locative);
 
-        return $locative . (string)$suffix;
+        return $suffix ?? '';
     }
 
     public static function generateManual(): HandlerManualData
@@ -45,11 +45,11 @@ class AddLocativeSuffixHandler implements HandlerInterface
         $pipeManualData = new PipeManualData(
             false,
             'locative',
-            'The base word to which the locative suffix should be added'
+            'The main word for which you should choose a locative suffix'
         );
 
         $argumentManualData = [
-            new ArgumentManualData(0, false, 'locative', 'The base word to which the locative suffix should be added',[
+            new ArgumentManualData(0, false, 'locative', 'The main word for which you should choose a locative suffix',[
                 'İstanbul',
                 'Yalova'
             ])
@@ -58,7 +58,7 @@ class AddLocativeSuffixHandler implements HandlerInterface
         return new HandlerManualData(
             static::getAlias(),
             static::getAllowedLanguagesIso(),
-            'Adds the appropriate locative suffix ("\'de" or "\'da") to the given word based on vowel harmony. Specific to the Turkish language.',
+            'Selects the appropriate locative suffix ("\'de" or "\'da") to the given word based on vowel harmony. Specific to the Turkish language.',
             $argumentManualData,
             $pipeManualData
         );

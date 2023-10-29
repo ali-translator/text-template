@@ -13,21 +13,21 @@ class UkrainianLettersHelper
 
     public static function isVowels(string $letter): bool
     {
-        return in_array($letter, static::$vowels);
+        return in_array(mb_strtolower($letter), static::$vowels);
     }
 
     public static function isVowelWithVowelFirstSound(string $letter): bool
     {
-        return in_array($letter, static::$vowelsWithVowelFirstSound);
+        return in_array(mb_strtolower($letter), static::$vowelsWithVowelFirstSound);
     }
 
     public static function isVowelWithConsonantFirstSound(string $letter): bool
     {
-        return in_array($letter, static::$vowelsWithConsonantFirstSound);
+        return in_array(mb_strtolower($letter), static::$vowelsWithConsonantFirstSound);
     }
 
     public static function isConsonant(string $letter): bool
     {
-        return in_array($letter, static::$consonants);
+        return in_array(mb_strtolower($letter), static::$consonants);
     }
 }
