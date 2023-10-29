@@ -101,17 +101,9 @@ Handlers are the core functionalities behind the Functions Syntax. They offer th
 : Appends the correct locative suffix to a given word in Turkish.<br>
 ```{tr_addLocativeSuffix('İstanbul')}``` -> ```İstanbul'da```
 
-* ChooseLocativeSuffixHandler (Turkish)
-  : Selects the correct locative suffix to a given word in Turkish.<br>
-  ```{tr_chooseLocativeSuffix('İstanbul')}``` -> ```'da```
-
 * AddDirectionalSuffixHandler (Turkish)
-  : Adds the appropriate directional suffix ("\'a", "\'e", "\'ya", "\'ye") to the given word based on vowel harmony.<br>
-  ```{tr_addDirectionalSuffix('Kale')}``` -> ```Kale'ye```
-
-* ChooseDirectionalSuffixHandler (Turkish)
-  : Selects the appropriate directional suffix ("\'a", "\'e", "\'ya", "\'ye") to the given word based on vowel harmony.<br>
-  ```{tr_chooseDirectionalSuffix('Kale')}``` -> ```'ye```
+: Adds the appropriate directional suffix ("\'a", "\'e", "\'ya", "\'ye") to the given word based on vowel harmony.<br>
+```{tr_addDirectionalSuffix('Kale')}``` -> ```Kale'ye```
 
 * ChoosePrepositionBySonorityHandler (Ukrainian)
 : Determines the correct preposition for the given word in Ukrainian.<br>

@@ -25,9 +25,7 @@ class DefaultHandlersFacade
         FirstCharacterInUppercaseHandler::class,
         PluralHandler::class,
         Turkish\AddDirectionalSuffixHandler::class,
-        Turkish\ChooseDirectionalSuffixHandler::class,
         Turkish\AddLocativeSuffixHandler::class,
-        Turkish\ChooseLocativeSuffixHandler::class,
         Ukrainian\ChoosePrepositionBySonorityHandler::class,
         Russian\ChoosePrepositionBySonorityHandler::class,
     ];
@@ -74,14 +72,8 @@ class DefaultHandlersFacade
                 case AddDirectionalSuffixHandler::class:
                     $handlers[] = new AddDirectionalSuffixHandler(new DirectionalSuffixChooser());
                     break;
-                case ChooseDirectionalSuffixHandler::class:
-                    $handlers[] = new ChooseDirectionalSuffixHandler(new DirectionalSuffixChooser());
-                    break;
                 case AddLocativeSuffixHandler::class:
                     $handlers[] = new AddLocativeSuffixHandler(new LocativeSuffixChooser());
-                    break;
-                case ChooseLocativeSuffixHandler::class:
-                    $handlers[] = new ChooseLocativeSuffixHandler(new LocativeSuffixChooser());
                     break;
                 case PluralHandler::class:
                     $handlers[] = new PluralHandler($forLanguagesISO ? current($forLanguagesISO) : 'en');
