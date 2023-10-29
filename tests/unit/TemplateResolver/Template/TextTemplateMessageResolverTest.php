@@ -69,7 +69,7 @@ class TextTemplateMessageResolverTest extends TestCase
         $this->assertEquals("Hello {user_name} from {tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase()}", $textTemplate->resolve());
 
         // Mixing variables types
-        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {tr_addLocativeSuffix(city_name)|makeFirstCharacterInUppercase()} and {|print(city_name)|makeFirstCharacterInLowercase()}', [
+        $textTemplate = $textTemplateFactory->create('Hello {user_name} from {tr_addLocativeSuffix(city_name, "\'")|makeFirstCharacterInUppercase()} and {print(city_name)|makeFirstCharacterInLowercase()}', [
             'user_name' => 'Tom',
             'city_name' => 'i̇stanbul',
         ]);

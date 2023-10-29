@@ -37,7 +37,13 @@ class LogicVariableParser
                 $operationConfig = [];
                 foreach ($explodedParameters as $parameter) {
                     $parameterWithoutSpaces = trim($parameter);
-                    $parameterWithoutQuotes = trim($parameterWithoutSpaces,'\'"');
+
+                    // deleting in two steps will not delete text like "'"
+                    $parameterWithoutQuotes = trim($parameterWithoutSpaces, "'");
+                    if ($parameterWithoutQuotes === $parameterWithoutSpaces) {
+                        $parameterWithoutQuotes = trim($parameterWithoutSpaces, '"');
+                    }
+
                     if ($parameterWithoutSpaces === $parameterWithoutQuotes) {
                         // Variable id
                         $operationConfig[] = [

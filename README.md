@@ -114,5 +114,5 @@ Handlers are the core functionalities behind the Functions Syntax. They offer th
 ### Tests
 ```bash
 php composer install
-php vendor/bin/phpunit
+./vendor/bin/phpunit
 ```
