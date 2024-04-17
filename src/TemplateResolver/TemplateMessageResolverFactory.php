@@ -56,13 +56,23 @@ class TemplateMessageResolverFactory
         $this->logicVariableParser = $logicVariableParser;
     }
 
+    private array $cachedTemplateMessageResolvers = [];
+
     /**
      * @param string|null $messageFormat
+     * @return TemplateMessageResolver
      * @see MessageFormatsEnum
      */
     public function generateTemplateMessageResolver(?string $messageFormat): TemplateMessageResolver
     {
-        switch ($messageFormat ?? MessageFormatsEnum::TEXT_TEMPLATE) {
+        $messageFormat = $messageFormat ?? MessageFormatsEnum::TEXT_TEMPLATE;
+
+        if (isset($this->cachedTemplateMessageResolvers[$messageFormat])) {
+            return $this->cachedTemplateMessageResolvers[$messageFormat];
+        }
+
+        // TODO in next iterations - leave only MessageFormatsEnum::TEXT_TEMPLATE one
+        switch ($messageFormat) {
             case MessageFormatsEnum::TEXT_TEMPLATE:
                 $templateMessageResolver = new TextTemplateMessageResolver(
                     $this->keyGenerator,
@@ -81,6 +91,8 @@ class TemplateMessageResolverFactory
             default:
                 throw new RuntimeException('Undefined message format "' . $messageFormat . '"');
         }
+
+        $this->cachedTemplateMessageResolvers[$messageFormat] = $templateMessageResolver;
 
         return $templateMessageResolver;
     }

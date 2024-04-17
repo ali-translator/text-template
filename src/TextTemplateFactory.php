@@ -16,11 +16,7 @@ class TextTemplateFactory
     }
 
     /**
-     * @param string $content
-     * @param array $parameters
      * @param string|TemplateMessageResolver $messageFormat
-     * @param array $customTextItemOptions
-     * @return TextTemplateItem
      */
     public function create(
         string $content,
@@ -29,30 +25,52 @@ class TextTemplateFactory
         array $customTextItemOptions = []
     ): TextTemplateItem
     {
-        $textTemplatesCollection = null;
-        if ($parameters) {
-            $textTemplatesCollection = new TextTemplatesCollection();
-            foreach ($parameters as $childContentId => $childData) {
-                if (!is_array($childData)) {
-                    if ($childData instanceof TextTemplateItem) {
-                        $textTemplateItem = $childData;
-                    } else {
-                        $textTemplateItem = $this->create((string)$childData);
-                    }
-                } else {
-                    $childContentSting = $childData['content'] ?? '';
-                    $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
+        $textTemplatesCollection = $this->generateTextTemplateCollection($parameters);
+        $templateMessageResolver = $this->generateTemplateMessageResolver($messageFormat, $textTemplatesCollection);
 
-                    $textTemplateItem = $this->create($childContentSting, $childParameters, $childData['format'] ?? null);
-                    if (isset($childData['options'])) {
-                        $textTemplateItem->setCustomOptions($childData['options']);
-                    }
-                }
+        return new TextTemplateItem(
+            $content,
+            $textTemplatesCollection,
+            $templateMessageResolver,
+            $customTextItemOptions
+        );
+    }
 
-                $textTemplatesCollection->add($textTemplateItem, $childContentId);
-            }
+    protected function generateTextTemplateCollection(array $parameters): ?TextTemplatesCollection
+    {
+        if (!$parameters) {
+            return null;
         }
 
+        $textTemplatesCollection = new TextTemplatesCollection();
+        foreach ($parameters as $childContentId => $childData) {
+            if (!is_array($childData)) {
+                if ($childData instanceof TextTemplateItem) {
+                    $textTemplateItem = $childData;
+                } else {
+                    $textTemplateItem = $this->create((string)$childData);
+                }
+            } else {
+                $childContentSting = $childData['content'] ?? '';
+                $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
+
+                $textTemplateItem = $this->create($childContentSting, $childParameters, $childData['format'] ?? null);
+                if (isset($childData['options'])) {
+                    $textTemplateItem->setCustomOptions($childData['options']);
+                }
+            }
+
+            $textTemplatesCollection->add($textTemplateItem, $childContentId);
+        }
+
+        return $textTemplatesCollection;
+    }
+
+    /**
+     * @param TemplateMessageResolver|string $messageFormat
+     */
+    protected function generateTemplateMessageResolver($messageFormat, ?TextTemplatesCollection $textTemplatesCollection): TemplateMessageResolver
+    {
         if (!$messageFormat) {
             $messageFormat = $textTemplatesCollection ? MessageFormatsEnum::TEXT_TEMPLATE : MessageFormatsEnum::PLAIN_TEXT;
         }
@@ -62,6 +80,6 @@ class TextTemplateFactory
             $templateMessageResolver = $messageFormat;
         }
 
-        return new TextTemplateItem($content, $textTemplatesCollection, $templateMessageResolver, $customTextItemOptions);
+        return $templateMessageResolver;
     }
 }

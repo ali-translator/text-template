@@ -69,12 +69,13 @@ In our system, Functions provide a dynamic way to manipulate and format text. Th
 
 ### Handlers that process Functions
 
-Handlers are the core functionalities behind the Functions Syntax. They offer the ability to manipulate text and data in various ways.
+Handlers are the core functionalities behind the Function Syntax.
+They offer the ability to manipulate text and data in various ways.
 
 #### Handlers available out of the box:
 
 * PrintHandler
-: Prints the value of a "static"/"plain variable". Can be used as input to another handler function.
+: Print the value of a "static"/"plain variable". Can be used as input to another handler function.
 ```{print('Hello World')}```
 
 * HideHandler
