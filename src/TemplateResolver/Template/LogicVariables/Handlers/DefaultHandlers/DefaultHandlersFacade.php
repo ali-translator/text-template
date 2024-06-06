@@ -9,8 +9,6 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Common\PrintHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddDirectionalSuffixHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\AddLocativeSuffixHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\ChooseDirectionalSuffixHandler;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\ChooseLocativeSuffixHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\DirectionalSuffixChooser;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHandlers\Turkish\Services\LocativeSuffixChooser;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlerInterface;
@@ -26,6 +24,7 @@ class DefaultHandlersFacade
         PluralHandler::class,
         Turkish\AddDirectionalSuffixHandler::class,
         Turkish\AddLocativeSuffixHandler::class,
+        Turkish\ChooseQuestionSuffixHandler::class,
         Ukrainian\ChoosePrepositionBySonorityHandler::class,
         Russian\ChoosePrepositionBySonorityHandler::class,
     ];

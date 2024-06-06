@@ -108,6 +108,12 @@ They offer the ability to manipulate text and data in various ways.
 : Without apostrophe: <br>
 ```{tr_addDirectionalSuffix('Ev', '')}``` -> ```Eve```
 
+* ChooseQuestionSuffixHandler (Turkish)
+  : Choose the appropriate question suffix ("mı", "mi", "mu", "mü") for the given word based on vowel harmony.
+  Specific to the Turkish language.<br>
+  ```Şehriniz {city_name} {tr_chooseQuestionSuffix(city_name)}?``` results for "İstanbul"
+  will be ```Şehriniz İstanbul mu?```
+
 * ChoosePrepositionBySonorityHandler (Ukrainian)
 : Determines the correct preposition for the given word in Ukrainian.<br>
 ```Поїздка {uk_choosePreposition('Поїздка', 'в/у', 'Львів')} Львів```
