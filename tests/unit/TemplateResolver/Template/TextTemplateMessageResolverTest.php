@@ -143,4 +143,40 @@ class TextTemplateMessageResolverTest extends TestCase
         $templateItem = $textTemplateFactory->create($templateContent, ['appleNumbers' => 0]);
         $this->assertEquals("Tom {uk_choosePreposition()}", $templateMessageResolver->resolve($templateItem));
     }
+
+    public function testAfterResolvedContentModifier()
+    {
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
+
+        $templateItem = $textTemplateFactory->create('1 {appleName} {print(appleName)|makeFirstCharacterInUppercase()} 3', [
+                'appleName' => [
+                    'content' => 'yy{number}',
+                    'parameters' => [
+                        'number' => 53,
+                    ],
+                    'options' => [
+                        TextTemplateItem::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER => function (?string $text) {
+                            return $text . $text;
+                        }
+                    ]
+                ],
+            ]
+            , MessageFormatsEnum::TEXT_TEMPLATE,
+            [
+                TextTemplateItem::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER => function (?string $text) {
+                    return '#' . $text . '@';
+                }
+            ]);
+
+        $this->assertEquals('#1 yy53yy53 Yy53yy53 3@', $templateItem->resolve());
+
+        $templateItem = $textTemplateFactory->create('Tom has {appleNumbers} apples', [
+            'appleNumbers' => 5,
+        ], MessageFormatsEnum::TEXT_TEMPLATE, [
+            TextTemplateItem::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER => function (?string $text) {
+                return str_replace(5, 3, $text);
+            }
+        ]);
+        $this->assertEquals('Tom has 3 apples', $templateItem->resolve());
+    }
 }

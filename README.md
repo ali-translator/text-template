@@ -55,6 +55,16 @@ $textTemplate = $textTemplateFactory->create('Tom has {appleNumbers}', [
     'appleNumbers' => $insideTextTemplate,
 ]);
 // Result: "Tom has one apple"
+
+// A modifier that is called after resolution
+$templateItem = $textTemplateFactory->create('Tom has {appleNumbers} apples', [
+    'appleNumbers' => 5,
+], MessageFormatsEnum::TEXT_TEMPLATE, [
+    TextTemplateItem::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER => function (?string $text) {
+        return str_replace(5, 3, $text);
+    }
+]);
+// Result: "Tom has 3 apples"
 ```
 
 ### Functions Syntax

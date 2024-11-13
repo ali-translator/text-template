@@ -7,6 +7,8 @@ use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 
 class TextTemplateItem
 {
+    public const OPTION_AFTER_RESOLVED_CONTENT_MODIFIER = 1000;
+
     protected string $content;
 
     protected ?TextTemplatesCollection $childTextTemplatesCollection = null;
@@ -31,7 +33,14 @@ class TextTemplateItem
 
     public function resolve(): string
     {
-        return $this->templateMessageResolver->resolve($this);
+        $resolvedContent = $this->templateMessageResolver->resolve($this);
+
+        $afterResolvedContentModifier = $this->getAfterResolvedContentModifier();
+        if ($afterResolvedContentModifier) {
+            $resolvedContent = $afterResolvedContentModifier($resolvedContent);
+        }
+
+        return $resolvedContent;
     }
 
     public function getContent(): string
@@ -62,6 +71,23 @@ class TextTemplateItem
     public function setCustomOptions(array $customOptions): void
     {
         $this->customOptions = $customOptions;
+    }
+
+    public function setCustomOptionItem(string $key, $value): self
+    {
+        $this->customOptions[$key] = $value;
+
+        return $this;
+    }
+
+    public function getAfterResolvedContentModifier(): ?callable
+    {
+        return $this->getCustomOptions()[self::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER] ?? null;
+    }
+
+    public function setAfterResolvedContentModifier(?callable $afterResolvedContentModifier): TextTemplateItem
+    {
+        return $this->setCustomOptionItem(self::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER, $afterResolvedContentModifier);
     }
 
     private string $_idHash;
