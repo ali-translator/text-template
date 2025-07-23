@@ -2,6 +2,12 @@
 .idea
 
 composer.lock
-/vendor/
+/vendor
 /tests/_data/
 .phpunit.result.cache
+
+# For testing different PHP versions
+composer-8.4.lock
+composer-7.4.lock
+/vendor-8.4/
+/vendor-7.4/

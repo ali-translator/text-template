@@ -8,7 +8,7 @@ class UndefinedHandlerException extends RuntimeException
 {
     protected string $handlerAlias;
 
-    public function __construct(string $handlerAlias, \Throwable $previous = null)
+    public function __construct(string $handlerAlias, ?\Throwable $previous = null)
     {
         $this->handlerAlias = $handlerAlias;
         parent::__construct('Unknown handler "' . $handlerAlias . '". Perhaps it is not registered or does not support selected language.', 0, $previous);

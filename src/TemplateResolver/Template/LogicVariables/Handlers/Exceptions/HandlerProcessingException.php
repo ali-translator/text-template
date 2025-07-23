@@ -9,7 +9,7 @@ class HandlerProcessingException extends RuntimeException
 {
     protected string $handlerAlias;
 
-    public function __construct(string $handlerAlias, string $message, Throwable $previous = null)
+    public function __construct(string $handlerAlias, string $message, ?Throwable $previous = null)
     {
         $this->handlerAlias = $handlerAlias;
         parent::__construct('Handler "' . $handlerAlias . '": ' . $message, 0, $previous);
