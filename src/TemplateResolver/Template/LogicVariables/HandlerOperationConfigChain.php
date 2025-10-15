@@ -69,4 +69,12 @@ class HandlerOperationConfigChain
 
         return $plainVariablesNames;
     }
+
+    /**
+     * @return HandlerOperationConfig[]
+     */
+    public function getOperationConfigs(): array
+    {
+        return $this->operationConfigs;
+    }
 }

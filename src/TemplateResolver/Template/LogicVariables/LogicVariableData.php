@@ -26,4 +26,12 @@ class LogicVariableData
     {
         return $this->operationConfigChain->getAllPlainVariablesNames();
     }
+
+    /**
+     * @return HandlerOperationConfig[]
+     */
+    public function getHandlerOperationConfigs(): array
+    {
+        return $this->operationConfigChain->getOperationConfigs();
+    }
 }
