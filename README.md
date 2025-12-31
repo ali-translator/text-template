@@ -2,7 +2,7 @@
 
 ## Installation
 
-This installation requires php ^7.4
+This installation requires php >=7.4 <8.5
 
 ```bash
 $ composer require ali-translator/text-template:^1
