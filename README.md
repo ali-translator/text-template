@@ -67,6 +67,43 @@ $templateItem = $textTemplateFactory->create('Tom has {appleNumbers} apples', [
 // Result: "Tom has 3 apples"
 ```
 
+### Conditional nodes
+
+Use Twig-like block tags for conditional branches. Inside a node body you can keep using `{variable}` and function syntax.
+
+```php
+$content = '{% if is_daytime %}\n  Good day, {user_name}!\n{% else %}\n  Good evening, {user_name}!\n{% endif %}';
+$textTemplate = $textTemplateFactory->create($content, [
+    'user_name' => 'Jerry',
+    'is_daytime' => true,
+]);
+echo $textTemplate->resolve();
+// Result: "\n  Good day, Jerry!\n" (whitespace preserved)
+```
+
+Conditions support simple expressions like:
+
+```
+{% if online == false %}...{% endif %}
+{% if product_stock > 10 %}...{% elseif product_stock > 0 %}...{% else %}...{% endif %}
+```
+
+### Loop nodes
+
+Loop through arrays using `{% for item in items %}` and `{% endfor %}`. For array items, nested keys are exposed as `{item.key}`.
+
+```php
+$content = '{% for user in users %}{print(user.name)|makeFirstCharacterInUppercase()} ({user.city}) {% endfor %}';
+$textTemplate = $textTemplateFactory->create($content, [
+    'users' => [
+        ['name' => 'tom', 'city' => 'london'],
+        ['name' => 'kate', 'city' => 'rome'],
+    ],
+]);
+echo $textTemplate->resolve();
+// Result: "Tom (london) Kate (rome) "
+```
+
 ### Functions Syntax
 
 In our system, Functions provide a dynamic way to manipulate and format text. They utilize a syntax that closely resembles the pipe functionality in Unix-based systems, allowing for a chained or sequential application of multiple functions.

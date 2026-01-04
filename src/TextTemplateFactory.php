@@ -26,6 +26,9 @@ class TextTemplateFactory
     ): TextTemplateItem
     {
         $textTemplatesCollection = $this->generateTextTemplateCollection($parameters);
+        if (!$messageFormat && strpos($content, '{%') !== false) {
+            $messageFormat = MessageFormatsEnum::TEXT_TEMPLATE;
+        }
         $templateMessageResolver = $this->generateTemplateMessageResolver($messageFormat, $textTemplatesCollection);
 
         return new TextTemplateItem(
@@ -50,7 +53,7 @@ class TextTemplateFactory
                 } else {
                     $textTemplateItem = $this->create((string)$childData);
                 }
-            } else {
+            } elseif ($this->isTemplateDescriptorArray($childData)) {
                 $childContentSting = $childData['content'] ?? '';
                 $childParameters = $childData['parameters'] ?? $childData['params'] ?? [];
 
@@ -58,6 +61,8 @@ class TextTemplateFactory
                 if (isset($childData['options'])) {
                     $textTemplateItem->setCustomOptions($childData['options']);
                 }
+            } else {
+                $textTemplateItem = $this->createRawValueItem($childData);
             }
 
             $textTemplatesCollection->add($textTemplateItem, $childContentId);
@@ -81,5 +86,21 @@ class TextTemplateFactory
         }
 
         return $templateMessageResolver;
+    }
+
+    private function isTemplateDescriptorArray(array $data): bool
+    {
+        $keys = ['content', 'parameters', 'params', 'format', 'options'];
+        $intersects = array_intersect_key($data, array_flip($keys));
+
+        return !empty($intersects);
+    }
+
+    private function createRawValueItem(array $rawValue): TextTemplateItem
+    {
+        $textTemplateItem = new TextTemplateItem('');
+        $textTemplateItem->setRawValue($rawValue);
+
+        return $textTemplateItem;
     }
 }

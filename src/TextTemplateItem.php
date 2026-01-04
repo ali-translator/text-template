@@ -8,6 +8,7 @@ use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 class TextTemplateItem
 {
     public const OPTION_AFTER_RESOLVED_CONTENT_MODIFIER = 1000;
+    public const OPTION_RAW_VALUE = 1001; // Used for storing raw values for Node conditions (array, object, etc.)
 
     protected string $content;
 
@@ -88,6 +89,21 @@ class TextTemplateItem
     public function setAfterResolvedContentModifier(?callable $afterResolvedContentModifier): TextTemplateItem
     {
         return $this->setCustomOptionItem(self::OPTION_AFTER_RESOLVED_CONTENT_MODIFIER, $afterResolvedContentModifier);
+    }
+
+    public function setRawValue($rawValue): TextTemplateItem
+    {
+        return $this->setCustomOptionItem(self::OPTION_RAW_VALUE, $rawValue);
+    }
+
+    public function hasRawValue(): bool
+    {
+        return array_key_exists(self::OPTION_RAW_VALUE, $this->customOptions);
+    }
+
+    public function getRawValue()
+    {
+        return $this->customOptions[self::OPTION_RAW_VALUE] ?? null;
     }
 
     private string $_idHash;

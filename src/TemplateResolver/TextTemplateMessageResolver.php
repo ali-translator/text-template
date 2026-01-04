@@ -3,6 +3,10 @@
 namespace ALI\TextTemplate\TemplateResolver;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Node\ConditionEvaluator;
+use ALI\TextTemplate\TemplateResolver\Node\Exceptions\NodeParsingException;
+use ALI\TextTemplate\TemplateResolver\Node\NodeParser;
+use ALI\TextTemplate\TemplateResolver\Node\TextNodeMessageResolver;
 use ALI\TextTemplate\TemplateResolver\Template\Exceptions\VariableResolvingException;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
@@ -20,6 +24,9 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     private TextKeysHandler $textKeysHandler;
     private ?LogicVariableParser $logicVariableParser;
     private ?HandlersRepositoryInterface $handlersRepository;
+    private NodeParser $nodeParser;
+    private ConditionEvaluator $conditionEvaluator;
+    private ?TextNodeMessageResolver $textNodeMessageResolver = null;
     // "SilentMode" will catch all parser errors and not pass them to you
     private bool $silentMode;
 
@@ -34,6 +41,8 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         $this->textKeysHandler = new TextKeysHandler();
         $this->handlersRepository = $logicVariableHandlersRepository;
         $this->logicVariableParser = $logicVariableParser;
+        $this->conditionEvaluator = new ConditionEvaluator();
+        $this->nodeParser = new NodeParser($keyGenerator);
         $this->silentMode = $silentMode;
     }
 
@@ -44,35 +53,66 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
     public function resolve(TextTemplateItem $templateItem): string
     {
+        $content = $templateItem->getContent();
         $childTextTemplatesCollection = $templateItem->getChildTextTemplatesCollection();
+        $workingTextTemplatesCollection = $childTextTemplatesCollection;
 
-        // Without any variables
-        if (!$childTextTemplatesCollection) {
-            return $templateItem->getContent();
+        $nodeParseResult = null;
+        if (strpos($content, '{%') !== false) {
+            try {
+                $nodeParseResult = $this->nodeParser->parse($content);
+            } catch (NodeParsingException $exception) {
+                if (!$this->silentMode) {
+                    throw $exception;
+                }
+            }
         }
 
-        // TODO Check and parse-create Nodes, if needed
-        // Nodes will be like {node_number_1}, {node_number_2} etc.
-        // And in the next steps will be resolve as a "Plain template variable".
+        if ($nodeParseResult && $nodeParseResult->hasNodes()) {
+            $content = $nodeParseResult->getContent();
+            if ($workingTextTemplatesCollection) {
+                $workingTextTemplatesCollection = clone $workingTextTemplatesCollection;
+            } else {
+                $workingTextTemplatesCollection = new TextTemplatesCollection();
+            }
+
+            foreach ($nodeParseResult->getNodes() as $nodeId => $node) {
+                $nodeContent = $nodeParseResult->getNodeContent($nodeId) ?? '';
+                $nodeTemplateItem = new TextTemplateItem(
+                    $nodeContent,
+                    $workingTextTemplatesCollection,
+                    $this->getTextNodeMessageResolver(),
+                    [
+                        TextNodeMessageResolver::OPTION_NODE => $node
+                    ]
+                );
+                $workingTextTemplatesCollection->add($nodeTemplateItem, $nodeId);
+            }
+        }
+
+        // Without any variables
+        if (!$workingTextTemplatesCollection) {
+            return $content;
+        }
 
         // Has variables/logic variables/nodes
         return $this->textKeysHandler->replaceKeys(
             $this->keyGenerator,
-            $templateItem->getContent(),
+            $content,
             function (string $variableContent) use (
-                $childTextTemplatesCollection,
+                $workingTextTemplatesCollection,
                 $templateItem
             ) {
-                // Plain template variable (// TODO nodes also?)
+                // Plain template variable (including nodes)
                 $variableId = $variableContent;
-                $childValue = $childTextTemplatesCollection->get($variableId);
+                $childValue = $workingTextTemplatesCollection->get($variableId);
                 if ($childValue) {
                     return $childValue->resolve();
                 }
 
                 // Logic variable with additional handlers operations
                 if ($this->logicVariableParser->isTextLogicalVariable($variableContent)) {
-                    return $this->resolveLogicVariable($variableContent, $childTextTemplatesCollection);
+                    return $this->resolveLogicVariable($variableContent, $workingTextTemplatesCollection);
                 }
 
                 //dd('Undefined variable:' . $variableContent);
@@ -132,6 +172,18 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
             }
         }
 
+        $nodeConditions = $this->nodeParser->extractConditionExpressions($content);
+        foreach ($nodeConditions as $nodeCondition) {
+            foreach ($this->conditionEvaluator->getUsedVariables($nodeCondition) as $plainVariableName) {
+                $allPlainVariablesNames[$plainVariableName] = $plainVariableName;
+            }
+        }
+
+        $loopVariables = $this->nodeParser->extractLoopVariables($content);
+        foreach ($loopVariables as $loopVariableName) {
+            $allPlainVariablesNames[$loopVariableName] = $loopVariableName;
+        }
+
         return $allPlainVariablesNames;
     }
 
@@ -144,6 +196,9 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
         $allVariables = [];
         foreach ($allKeys as $templateKey) {
+            if ($this->isNodeTagKey($templateKey)) {
+                continue;
+            }
             // Logic variable with additional handlers operations
             if ($this->logicVariableParser->isTextLogicalVariable($templateKey)) {
                 try {
@@ -161,5 +216,29 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         }
 
         return $allVariables;
+    }
+
+    private function isNodeTagKey(string $templateKey): bool
+    {
+        $trimmedKey = trim($templateKey);
+        if ($trimmedKey === '') {
+            return false;
+        }
+
+        return $trimmedKey[0] === '%' && substr($trimmedKey, -1) === '%';
+    }
+
+    private function getTextNodeMessageResolver(): TextNodeMessageResolver
+    {
+        if (!$this->textNodeMessageResolver) {
+            $this->textNodeMessageResolver = new TextNodeMessageResolver(
+                $this,
+                $this->nodeParser,
+                $this->conditionEvaluator,
+                $this->silentMode
+            );
+        }
+
+        return $this->textNodeMessageResolver;
     }
 }

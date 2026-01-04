@@ -47,3 +47,13 @@ The result of each function is passed on to the next function in the chain:
 ```
 
 With each pipe, the output is transformed step by step until the final result is achieved.
+
+#### Functions inside nodes
+
+Function syntax works the same way inside conditional nodes:
+
+```
+{% if is_daytime %}
+  {print(user_name)|makeFirstCharacterInUppercase()}
+{% endif %}
+```
