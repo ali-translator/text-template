@@ -3,6 +3,7 @@
 namespace ALI\TextTemplate;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Node\NodeParser;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 
@@ -26,7 +27,7 @@ class TextTemplateFactory
     ): TextTemplateItem
     {
         $textTemplatesCollection = $this->generateTextTemplateCollection($parameters);
-        if (!$messageFormat && strpos($content, '{%') !== false) {
+        if (!$messageFormat && NodeParser::hasNodeTags($content)) {
             $messageFormat = MessageFormatsEnum::TEXT_TEMPLATE;
         }
         $templateMessageResolver = $this->generateTemplateMessageResolver($messageFormat, $textTemplatesCollection);

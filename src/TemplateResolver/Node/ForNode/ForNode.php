@@ -4,8 +4,10 @@ namespace ALI\TextTemplate\TemplateResolver\Node\ForNode;
 
 use ALI\TextTemplate\TemplateResolver\Node\NodeInterface;
 use ALI\TextTemplate\TemplateResolver\Node\NodeRuntime;
+use ALI\TextTemplate\TemplateResolver\Node\PlainVariablesAwareNodeInterface;
+use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageContextInterface;
 
-class ForNode implements NodeInterface
+class ForNode implements PlainVariablesAwareNodeInterface, NodeInterface
 {
     private string $itemName;
     private string $collectionName;
@@ -32,6 +34,12 @@ class ForNode implements NodeInterface
         }
 
         return $resolved;
+    }
+
+    public function collectPlainVariables(PlainVariablesUsageContextInterface $context): void
+    {
+        $loopContext = $context->enterLoop($this->itemName, $this->collectionName);
+        $loopContext->collectContent($this->content);
     }
 
     public function getItemName(): string

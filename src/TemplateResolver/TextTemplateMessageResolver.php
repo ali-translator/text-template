@@ -12,8 +12,8 @@ use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\TextKeysHandler;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVariableParsingExcepting;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
-use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
+use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageCollector;
 use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplatesCollection;
 use Exception;
@@ -27,6 +27,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     private NodeParser $nodeParser;
     private ConditionEvaluator $conditionEvaluator;
     private ?TextNodeMessageResolver $textNodeMessageResolver = null;
+    private ?PlainVariablesUsageCollector $_plainVariablesUsageCollector = null;
     // "SilentMode" will catch all parser errors and not pass them to you
     private bool $silentMode;
 
@@ -58,7 +59,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         $workingTextTemplatesCollection = $childTextTemplatesCollection;
 
         $nodeParseResult = null;
-        if (strpos($content, '{%') !== false) {
+        if (NodeParser::hasNodeTags($content)) {
             try {
                 $nodeParseResult = $this->nodeParser->parse($content);
             } catch (NodeParsingException $exception) {
@@ -157,32 +158,18 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
     public function getAllUsedPlainVariables(string $content): array
     {
-        $allVariables = $this->parseAllVariables($content);
-
-        $allPlainVariablesNames = [];
-        foreach ($allVariables as $variable) {
-            if (is_string($variable)) {
-                $allPlainVariablesNames[$variable] = $variable;
-            } elseif ($variable instanceof LogicVariableData) {
-                foreach ($variable->getAllPlainVariablesNames() as $plainVariableName) {
-                    $allPlainVariablesNames[$plainVariableName] = $plainVariableName;
-                }
-            }
+        if (!$this->_plainVariablesUsageCollector) {
+            $this->_plainVariablesUsageCollector = new PlainVariablesUsageCollector(
+                $this->nodeParser,
+                $this->textKeysHandler,
+                $this->keyGenerator,
+                $this->logicVariableParser,
+                $this->conditionEvaluator,
+                $this->silentMode
+            );
         }
 
-        $nodeConditions = $this->nodeParser->extractConditionExpressions($content);
-        foreach ($nodeConditions as $nodeCondition) {
-            foreach ($this->conditionEvaluator->getUsedVariables($nodeCondition) as $plainVariableName) {
-                $allPlainVariablesNames[$plainVariableName] = $plainVariableName;
-            }
-        }
-
-        $loopVariables = $this->nodeParser->extractLoopVariables($content);
-        foreach ($loopVariables as $loopVariableName) {
-            $allPlainVariablesNames[$loopVariableName] = $loopVariableName;
-        }
-
-        return $allPlainVariablesNames;
+        return $this->_plainVariablesUsageCollector->collect($content);
     }
 
     protected function parseAllVariables(string $content): array
@@ -194,7 +181,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
         $allVariables = [];
         foreach ($allKeys as $templateKey) {
-            if ($this->isNodeTagKey($templateKey)) {
+            if (NodeParser::isNodeTagKey($templateKey)) {
                 continue;
             }
             // Logic variable with additional handlers operations
@@ -214,16 +201,6 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         }
 
         return $allVariables;
-    }
-
-    private function isNodeTagKey(string $templateKey): bool
-    {
-        $trimmedKey = trim($templateKey);
-        if ($trimmedKey === '') {
-            return false;
-        }
-
-        return $trimmedKey[0] === '%' && substr($trimmedKey, -1) === '%';
     }
 
     private function getTextNodeMessageResolver(): TextNodeMessageResolver

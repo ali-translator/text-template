@@ -68,6 +68,43 @@ class ConditionEvaluator
         return $variables;
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public function getVariablesWithTypes(string $expression): array
+    {
+        $expression = trim($expression);
+        if ($expression === '') {
+            return [];
+        }
+
+        $split = $this->splitByOperator($expression);
+        if (!$split) {
+            $variable = $this->extractVariable($expression);
+            if ($variable !== null) {
+                return [$variable => 'boolean'];
+            }
+            return [];
+        }
+
+        [$leftRaw, $operator, $rightRaw] = $split;
+        $variables = [];
+
+        if (in_array($operator, ['>', '>=', '<', '<='], true)) {
+            $this->addVariableTypeFromOperand($variables, $leftRaw, 'number');
+            $this->addVariableTypeFromOperand($variables, $rightRaw, 'number');
+            return $variables;
+        }
+
+        $leftInfo = $this->inferOperandInfo($leftRaw);
+        $rightInfo = $this->inferOperandInfo($rightRaw);
+
+        $this->addComparisonType($variables, $leftInfo, $rightInfo);
+        $this->addComparisonType($variables, $rightInfo, $leftInfo);
+
+        return $variables;
+    }
+
     private function splitByOperator(string $expression): ?array
     {
         if (!preg_match('/^(?P<left>.+?)\s*(?P<operator>==|!=|>=|<=|>|<)\s*(?P<right>.+)$/s', $expression, $matches)) {
@@ -75,6 +112,84 @@ class ConditionEvaluator
         }
 
         return [trim($matches['left']), $matches['operator'], trim($matches['right'])];
+    }
+
+    /**
+     * @param array<string, string> $variables
+     */
+    private function addVariableTypeFromOperand(array &$variables, string $operand, string $type): void
+    {
+        $variable = $this->extractVariable($operand);
+        if ($variable === null) {
+            return;
+        }
+
+        $variables[$variable] = $type;
+    }
+
+    /**
+     * @return array{name: string|null, type: string|null, isVariable: bool}
+     */
+    private function inferOperandInfo(string $operand): array
+    {
+        $operand = trim($operand);
+        if ($operand === '') {
+            return [
+                'name' => null,
+                'type' => null,
+                'isVariable' => false,
+            ];
+        }
+
+        if ($this->isQuotedString($operand)) {
+            return [
+                'name' => null,
+                'type' => 'string',
+                'isVariable' => false,
+            ];
+        }
+
+        $lowerOperand = strtolower($operand);
+        if ($lowerOperand === 'true' || $lowerOperand === 'false') {
+            return [
+                'name' => null,
+                'type' => 'boolean',
+                'isVariable' => false,
+            ];
+        }
+
+        if (is_numeric($operand)) {
+            return [
+                'name' => null,
+                'type' => 'number',
+                'isVariable' => false,
+            ];
+        }
+
+        return [
+            'name' => $operand,
+            'type' => null,
+            'isVariable' => true,
+        ];
+    }
+
+    /**
+     * @param array<string, string> $variables
+     * @param array{name: string|null, type: string|null, isVariable: bool} $variableInfo
+     * @param array{name: string|null, type: string|null, isVariable: bool} $otherInfo
+     */
+    private function addComparisonType(array &$variables, array $variableInfo, array $otherInfo): void
+    {
+        if (!$variableInfo['isVariable'] || !$variableInfo['name']) {
+            return;
+        }
+
+        $type = $otherInfo['type'] ?? null;
+        if (!$type) {
+            $type = 'string';
+        }
+
+        $variables[$variableInfo['name']] = $type;
     }
 
     private function parseOperand(string $operand, ?TextTemplatesCollection $textTemplatesCollection): array

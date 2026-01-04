@@ -101,12 +101,16 @@ class TextTemplateMessageResolverTest extends TestCase
         $content = '{% if is_active == true %}Розваги {some_undefined_function("123",test_variable)} {print(city_name)|makeFirstCharacterInLowercase()} {test_variable_1}{% else %}{city_name}{% endif %} {% for user in users %}{user.name}{% endfor %}';
         $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content);
         $this->assertEquals([
-            "test_variable" => "test_variable",
-            "city_name" => "city_name",
-            "test_variable_1" => "test_variable_1",
-            "user.name" => "user.name",
-            "is_active" => "is_active",
-            "users" => "users"
+            "test_variable" => "string",
+            "city_name" => "string",
+            "test_variable_1" => "string",
+            "is_active" => "boolean",
+            "users" => [
+                "type" => "array",
+                "items" => [
+                    "name" => "string",
+                ],
+            ],
         ], $allUsedPlainVariables);
     }
 

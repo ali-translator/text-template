@@ -13,6 +13,9 @@ use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
 
 class NodeParser
 {
+    public const NODE_TAG_OPEN = '{%';
+    public const NODE_TAG_MARKER = '%';
+
     private const TAG_PATTERN = '/{%\s*(?<content>.+?)\s*%}/s';
 
     private const TAG_TYPE_START = 'start';
@@ -38,9 +41,29 @@ class NodeParser
         ];
     }
 
+    public static function hasNodeTags(?string $content): bool
+    {
+        if ($content === null || $content === '') {
+            return false;
+        }
+
+        return strpos($content, self::NODE_TAG_OPEN) !== false;
+    }
+
+    public static function isNodeTagKey(string $templateKey): bool
+    {
+        $trimmedKey = trim($templateKey);
+        if ($trimmedKey === '') {
+            return false;
+        }
+
+        return $trimmedKey[0] === self::NODE_TAG_MARKER
+            && substr($trimmedKey, -1) === self::NODE_TAG_MARKER;
+    }
+
     public function parse(string $content): NodeParseResult
     {
-        if (strpos($content, '{%') === false) {
+        if (!self::hasNodeTags($content)) {
             return new NodeParseResult($content, [], []);
         }
 
@@ -148,7 +171,7 @@ class NodeParser
      */
     public function extractConditionExpressions(string $content): array
     {
-        if (strpos($content, '{%') === false) {
+        if (!self::hasNodeTags($content)) {
             return [];
         }
 
@@ -176,7 +199,7 @@ class NodeParser
      */
     public function extractLoopVariables(string $content): array
     {
-        if (strpos($content, '{%') === false) {
+        if (!self::hasNodeTags($content)) {
             return [];
         }
 

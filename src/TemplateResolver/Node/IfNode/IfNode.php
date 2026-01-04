@@ -4,8 +4,10 @@ namespace ALI\TextTemplate\TemplateResolver\Node\IfNode;
 
 use ALI\TextTemplate\TemplateResolver\Node\NodeInterface;
 use ALI\TextTemplate\TemplateResolver\Node\NodeRuntime;
+use ALI\TextTemplate\TemplateResolver\Node\PlainVariablesAwareNodeInterface;
+use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageContextInterface;
 
-class IfNode implements NodeInterface
+class IfNode implements PlainVariablesAwareNodeInterface, NodeInterface
 {
     /**
      * @var IfNodeBranch[]
@@ -37,5 +39,17 @@ class IfNode implements NodeInterface
         }
 
         return '';
+    }
+
+    public function collectPlainVariables(PlainVariablesUsageContextInterface $context): void
+    {
+        foreach ($this->branches as $branch) {
+            $condition = $branch->getCondition();
+            if ($condition !== null) {
+                $context->collectCondition($condition);
+            }
+
+            $context->collectContent($branch->getContent());
+        }
     }
 }

@@ -47,13 +47,24 @@ class NodesPartsTest extends TestCase
             ],
         ]);
 
-//        dd($textTemplate->getChildTextTemplatesCollection());
-        dump($textTemplate->resolve());
+        // $textTemplate->resolve();
 
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
-        dd($templateMessageResolver->getAllUsedPlainVariables($content));
-
-//        $textTemplateFactory->
+        $this->assertEquals([
+            'user_name' => 'string',
+            'is_daytime' => 'boolean',
+            'numbers' => [
+                'type' => 'array',
+                'items' => 'number',
+            ],
+            'collection' => [
+                'type' => 'array',
+                'items' => [
+                    'name' => 'string',
+                    'age' => 'number',
+                ],
+            ],
+        ], $templateMessageResolver->getAllUsedPlainVariables($content));
     }
 }
