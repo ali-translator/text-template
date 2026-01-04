@@ -115,8 +115,6 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                     return $this->resolveLogicVariable($variableContent, $workingTextTemplatesCollection);
                 }
 
-                //dd('Undefined variable:' . $variableContent);
-
                 if (!$this->silentMode) {
                     throw new VariableResolvingException($variableContent, 'Undefined variable');
                 }
