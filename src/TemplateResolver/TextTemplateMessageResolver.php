@@ -1,6 +1,6 @@
 <?php
 
-namespace ALI\TextTemplate\TemplateResolver\Template;
+namespace ALI\TextTemplate\TemplateResolver;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TemplateResolver\Template\Exceptions\VariableResolvingException;
@@ -10,8 +10,8 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableData;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
-use ALI\TextTemplate\TemplateResolver\TemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateItem;
+use ALI\TextTemplate\TextTemplatesCollection;
 use Exception;
 
 class TextTemplateMessageResolver implements TemplateMessageResolver
@@ -45,9 +45,17 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     public function resolve(TextTemplateItem $templateItem): string
     {
         $childTextTemplatesCollection = $templateItem->getChildTextTemplatesCollection();
+
+        // Without any variables
         if (!$childTextTemplatesCollection) {
             return $templateItem->getContent();
         }
+
+        // TODO Check and parse-create Nodes, if needed
+        // Nodes will be like {node_number_1}, {node_number_2} etc.
+        // And in the next steps will be resolve as a "Plain template variable".
+
+        // Has variables/logic variables/nodes
         return $this->textKeysHandler->replaceKeys(
             $this->keyGenerator,
             $templateItem->getContent(),
@@ -55,7 +63,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 $childTextTemplatesCollection,
                 $templateItem
             ) {
-                // Plain template variable
+                // Plain template variable (// TODO nodes also?)
                 $variableId = $variableContent;
                 $childValue = $childTextTemplatesCollection->get($variableId);
                 if ($childValue) {
@@ -64,31 +72,10 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
 
                 // Logic variable with additional handlers operations
                 if ($this->logicVariableParser->isTextLogicalVariable($variableContent)) {
-                    try {
-                        $logicVariableData = $this->logicVariableParser->parse($variableContent);
-                    } catch (LogicVariableParsingExcepting $excepting) {
-                        if (!$this->silentMode) {
-                            throw new VariableResolvingException($variableContent, $excepting->getMessage());
-                        }
-                    }
-
-                    if (!empty($logicVariableData)) {
-                        try {
-                            $resolvedLogicalVariable = $logicVariableData
-                                ->run(
-                                    $childTextTemplatesCollection,
-                                    $this->handlersRepository
-                                );
-                        } catch (Exception $exception) {
-                        }
-                    }
-
-                    if (!isset($resolvedLogicalVariable) && !$this->silentMode) {
-                        throw new VariableResolvingException($variableContent, $exception->getMessage());
-                    }
-
-                    return $resolvedLogicalVariable ?? null;
+                    return $this->resolveLogicVariable($variableContent, $childTextTemplatesCollection);
                 }
+
+                //dd('Undefined variable:' . $variableContent);
 
                 if (!$this->silentMode) {
                     throw new VariableResolvingException($variableContent, 'Undefined variable');
@@ -97,6 +84,37 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 return null;
             }
         );
+    }
+
+    private function resolveLogicVariable(
+        string $variableContent,
+        TextTemplatesCollection $childTextTemplatesCollection
+    ): ?string
+    {
+        try {
+            $logicVariableData = $this->logicVariableParser->parse($variableContent);
+        } catch (LogicVariableParsingExcepting $excepting) {
+            if (!$this->silentMode) {
+                throw new VariableResolvingException($variableContent, $excepting->getMessage());
+            }
+        }
+
+        if (!empty($logicVariableData)) {
+            try {
+                $resolvedLogicalVariable = $logicVariableData
+                    ->run(
+                        $childTextTemplatesCollection,
+                        $this->handlersRepository
+                    );
+            } catch (Exception $exception) {
+            }
+        }
+
+        if (!isset($resolvedLogicalVariable) && !$this->silentMode) {
+            throw new VariableResolvingException($variableContent, $exception->getMessage());
+        }
+
+        return $resolvedLogicalVariable ?? null;
     }
 
     public function getAllUsedPlainVariables(string $content): array

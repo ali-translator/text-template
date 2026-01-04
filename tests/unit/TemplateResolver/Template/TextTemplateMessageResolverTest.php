@@ -3,8 +3,8 @@
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
-use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
+use ALI\TextTemplate\TemplateResolver\TextTemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplateItem;
 use PHPUnit\Framework\TestCase;

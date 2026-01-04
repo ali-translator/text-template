@@ -12,7 +12,6 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
-use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use RuntimeException;
 
 class TemplateMessageResolverFactory
