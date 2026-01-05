@@ -99,7 +99,7 @@ class TextTemplateMessageResolverTest extends TestCase
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
 
         $content = '{% if is_active == true %}Розваги {some_undefined_function("123",test_variable)} {print(city_name)|makeFirstCharacterInLowercase()} {test_variable_1}{% else %}{city_name}{% endif %} {% for user in users %}{user.name}{% endfor %}';
-        $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content);
+        $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content)->toArray();
         $this->assertEquals([
             "test_variable" => "string",
             "city_name" => "string",

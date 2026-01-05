@@ -56,7 +56,8 @@ class NodesPartsTest extends TestCase
             'is_daytime' => 'boolean',
             'numbers' => [
                 'type' => 'array',
-                'items' => 'number',
+                'itemScalarType' => 'number',
+                'items' => [],
             ],
             'collection' => [
                 'type' => 'array',
@@ -65,6 +66,6 @@ class NodesPartsTest extends TestCase
                     'age' => 'number',
                 ],
             ],
-        ], $templateMessageResolver->getAllUsedPlainVariables($content));
+        ], $templateMessageResolver->getAllUsedPlainVariables($content)->toArray());
     }
 }

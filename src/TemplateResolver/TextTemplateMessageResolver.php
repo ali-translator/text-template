@@ -14,6 +14,7 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\LogicVa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
 use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageCollector;
+use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageResultInterface;
 use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplatesCollection;
 use Exception;
@@ -156,7 +157,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         return $resolvedLogicalVariable ?? null;
     }
 
-    public function getAllUsedPlainVariables(string $content): array
+    public function getAllUsedPlainVariables(string $content): PlainVariablesUsageResultInterface
     {
         if (!$this->_plainVariablesUsageCollector) {
             $this->_plainVariablesUsageCollector = new PlainVariablesUsageCollector(

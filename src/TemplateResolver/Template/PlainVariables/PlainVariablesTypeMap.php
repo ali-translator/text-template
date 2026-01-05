@@ -2,14 +2,12 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Template\PlainVariables;
 
-class PlainVariablesTypeMap
+class PlainVariablesTypeMap implements PlainVariablesUsageResultInterface
 {
     public const TYPE_STRING = 'string';
     public const TYPE_BOOLEAN = 'boolean';
     public const TYPE_NUMBER = 'number';
     public const TYPE_ARRAY = 'array';
-
-    private const SELF_KEY = '_self';
 
     private const TYPE_PRIORITY = [
         self::TYPE_STRING => 1,
@@ -17,6 +15,9 @@ class PlainVariablesTypeMap
         self::TYPE_NUMBER => 3,
     ];
 
+    /**
+     * @var array<string, PlainVariableUsageDto>
+     */
     private array $variables = [];
 
     public function addScalar(array $path, string $type): void
@@ -48,8 +49,8 @@ class PlainVariablesTypeMap
         }
 
         $type = $this->normalizeScalarType($type);
-        $node = &$this->getOrCreateArrayNode($arrayPath);
-        $this->mergeScalarIntoItems($node['items'], $type);
+        $node = $this->getOrCreateArrayNode($arrayPath);
+        $this->mergeScalarIntoItemType($node, $type);
     }
 
     public function addArrayItemPropertyScalar(array $arrayPath, array $itemPath, string $type): void
@@ -64,16 +65,33 @@ class PlainVariablesTypeMap
         }
 
         $type = $this->normalizeScalarType($type);
-        $node = &$this->getOrCreateArrayNode($arrayPath);
-        $this->ensureItemsContainerArray($node);
-        $this->addScalarToMap($node['items'], $itemPath, $type);
+        $node = $this->getOrCreateArrayNode($arrayPath);
+        $items = &$node->getItemsRef();
+        $this->addScalarToMap($items, $itemPath, $type);
     }
 
     public function toArray(): array
     {
+        $this->normalizeItems();
+
+        $result = [];
+        foreach ($this->variables as $name => $variable) {
+            $result[$name] = $variable->toArray();
+        }
+
+        return $result;
+    }
+
+    public function toDtoMap(): array
+    {
+        $this->normalizeItems();
+
         return $this->variables;
     }
 
+    /**
+     * @param array<string, PlainVariableUsageDto> $map
+     */
     private function addScalarToMap(array &$map, array $path, string $type): void
     {
         $segment = array_shift($path);
@@ -82,21 +100,21 @@ class PlainVariablesTypeMap
         }
 
         if (!$path) {
-            if (isset($map[$segment]) && is_array($map[$segment]) && ($map[$segment]['type'] ?? null) === self::TYPE_ARRAY) {
+            if (isset($map[$segment]) && $map[$segment]->getType() === self::TYPE_ARRAY) {
                 return;
             }
 
-            $map[$segment] = $this->mergeScalarType($map[$segment] ?? null, $type);
+            $existingType = isset($map[$segment]) ? $map[$segment]->getType() : null;
+            $map[$segment] = new PlainVariableUsageDto($segment, $this->mergeScalarType($existingType, $type));
             return;
         }
 
-        $map = $this->prepareSegment($map, $segment);
-        $this->ensureItemsContainerArray($map[$segment]);
-
-        $this->addScalarToMap($map[$segment]['items'], $path, $type);
+        $node = $this->getOrCreateArraySegment($map, $segment);
+        $items = &$node->getItemsRef();
+        $this->addScalarToMap($items, $path, $type);
     }
 
-    private function &getOrCreateArrayNode(array $path): array
+    private function getOrCreateArrayNode(array $path): PlainVariableUsageDto
     {
         $current = &$this->variables;
         $lastSegment = array_pop($path);
@@ -106,18 +124,27 @@ class PlainVariablesTypeMap
                 continue;
             }
 
-            $current = $this->prepareSegment($current, $segment);
-            $this->ensureItemsContainerArray($current[$segment]);
-            $current = &$current[$segment]['items'];
+            $node = $this->getOrCreateArraySegment($current, $segment);
+            $current = &$node->getItemsRef();
         }
 
         if ($lastSegment === null || $lastSegment === '') {
-            return $current;
+            return new PlainVariableUsageDto('', self::TYPE_ARRAY);
         }
 
-        $current = $this->prepareSegment($current, $lastSegment);
+        return $this->getOrCreateArraySegment($current, $lastSegment);
+    }
 
-        return $current[$lastSegment];
+    /**
+     * @param array<string, PlainVariableUsageDto> $map
+     */
+    private function getOrCreateArraySegment(array &$map, string $segment): PlainVariableUsageDto
+    {
+        if (!isset($map[$segment]) || $map[$segment]->getType() !== self::TYPE_ARRAY) {
+            $map[$segment] = new PlainVariableUsageDto($segment, self::TYPE_ARRAY);
+        }
+
+        return $map[$segment];
     }
 
     private function normalizePath(array $path): array
@@ -156,63 +183,32 @@ class PlainVariablesTypeMap
         return $existing;
     }
 
-    private function ensureItemsContainerArray(array &$node): void
+    private function mergeScalarIntoItemType(PlainVariableUsageDto $node, string $type): void
     {
-        if (!isset($node['items'])) {
-            $node['items'] = [];
-            return;
-        }
+        $merged = $this->mergeScalarType($node->getItemScalarType(), $type);
+        $node->setItemScalarType($merged);
+    }
 
-        if (is_string($node['items'])) {
-            $node['items'] = [
-                self::SELF_KEY => $node['items'],
-            ];
-            return;
-        }
-
-        if (!is_array($node['items'])) {
-            $node['items'] = [];
+    private function normalizeItems(): void
+    {
+        foreach ($this->variables as $variable) {
+            $this->normalizeDto($variable);
         }
     }
 
-    private function mergeScalarIntoItems(&$items, string $type): void
+    private function normalizeDto(PlainVariableUsageDto $variable): void
     {
-        if (!isset($items)) {
-            $items = $type;
+        if ($variable->getType() !== self::TYPE_ARRAY) {
             return;
         }
 
-        if (is_string($items)) {
-            $items = $this->mergeScalarType($items, $type);
-            return;
+        $items = &$variable->getItemsRef();
+        if ($items === [] && $variable->getItemScalarType() === null) {
+            $variable->setItemScalarType(self::TYPE_STRING);
         }
 
-        if (!is_array($items)) {
-            $items = $type;
-            return;
+        foreach ($items as $item) {
+            $this->normalizeDto($item);
         }
-
-        if ($items === []) {
-            $items = $type;
-            return;
-        }
-
-        $items[self::SELF_KEY] = $this->mergeScalarType($items[self::SELF_KEY] ?? null, $type);
-    }
-
-    private function prepareSegment($current, $segment)
-    {
-        if (
-            (!isset($current[$segment]) || is_string($current[$segment]))
-            ||
-            (is_array($current[$segment]) && ($current[$segment]['type'] ?? null) !== self::TYPE_ARRAY)
-        ) {
-            $current[$segment] = [
-                'type' => self::TYPE_ARRAY,
-                'items' => [],
-            ];
-        }
-
-        return $current;
     }
 }
