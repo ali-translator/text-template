@@ -57,7 +57,11 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     {
         $content = $templateItem->getContent();
         $childTextTemplatesCollection = $templateItem->getChildTextTemplatesCollection();
-        $workingTextTemplatesCollection = $childTextTemplatesCollection;
+
+        // Without any variables - skip additional checks
+        if (!$childTextTemplatesCollection) {
+            return $content;
+        }
 
         $nodeParseResult = null;
         if (NodeParser::hasNodeTags($content)) {
@@ -70,13 +74,10 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
             }
         }
 
+        $workingTextTemplatesCollection = $childTextTemplatesCollection;
         if ($nodeParseResult && $nodeParseResult->hasNodes()) {
             $content = $nodeParseResult->getContent();
-            if ($workingTextTemplatesCollection) {
-                $workingTextTemplatesCollection = clone $workingTextTemplatesCollection;
-            } else {
-                $workingTextTemplatesCollection = new TextTemplatesCollection();
-            }
+            $workingTextTemplatesCollection = clone $workingTextTemplatesCollection;
 
             foreach ($nodeParseResult->getNodes() as $nodeId => $node) {
                 $nodeContent = $nodeParseResult->getNodeContent($nodeId) ?? '';
@@ -90,11 +91,6 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
                 );
                 $workingTextTemplatesCollection->add($nodeTemplateItem, $nodeId);
             }
-        }
-
-        // Without any variables
-        if (!$workingTextTemplatesCollection) {
-            return $content;
         }
 
         // Has variables/logic variables/nodes
