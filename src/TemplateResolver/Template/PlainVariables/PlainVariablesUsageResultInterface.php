@@ -24,4 +24,6 @@ interface PlainVariablesUsageResultInterface
      * @return array<string>
      */
     public function toSimplifiedVariableNames(): array;
+
+    public function isEmpty(): bool;
 }

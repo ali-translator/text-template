@@ -99,6 +99,11 @@ class PlainVariablesTypeMap implements PlainVariablesUsageResultInterface
         return array_values($names);
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->variables);
+    }
+
     /**
      * @param array<string, PlainVariableUsageDto> $map
      */
