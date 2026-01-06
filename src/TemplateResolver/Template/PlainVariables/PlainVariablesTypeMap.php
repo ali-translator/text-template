@@ -89,6 +89,38 @@ class PlainVariablesTypeMap implements PlainVariablesUsageResultInterface
         return $this->variables;
     }
 
+    public function toSimplifiedVariableNames(): array
+    {
+        $names = [];
+
+        foreach ($this->variables as $variableUsageDto) {
+            $this->collectPlainVariableNames($variableUsageDto, $names, '');
+        }
+
+        return array_values($names);
+    }
+
+    /**
+     * @param array<string, string> $names
+     */
+    private function collectPlainVariableNames(PlainVariableUsageDto $variableUsageDto, array &$names, string $prefix): void
+    {
+        $name = $prefix ? $prefix . '.' . $variableUsageDto->getName() : $variableUsageDto->getName();
+        if ($name === '') {
+            return;
+        }
+
+        $names[$name] = $name;
+
+        if ($variableUsageDto->getType() !== PlainVariablesTypeMap::TYPE_ARRAY) {
+            return;
+        }
+
+        foreach ($variableUsageDto->getItems() as $item) {
+            $this->collectPlainVariableNames($item, $names, $name);
+        }
+    }
+
     /**
      * @param array<string, PlainVariableUsageDto> $map
      */

@@ -66,5 +66,14 @@ class NodesPartsTest extends TestCase
                 ],
             ],
         ], $templateMessageResolver->getAllUsedPlainVariables($content)->toArray());
+
+        $this->assertEquals([
+            "is_daytime",
+            "user_name",
+            "numbers",
+            "collection",
+            "collection.name",
+            "collection.age",
+        ], $templateMessageResolver->getAllUsedPlainVariables($content)->toSimplifiedVariableNames());
     }
 }
