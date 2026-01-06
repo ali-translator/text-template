@@ -92,4 +92,29 @@ class PlainVariableUsageDto
             'items' => array_map(fn($item) => $item->toArray(), $this->items),
         ];
     }
+
+    public function toSimplifiedVariableNames(): array
+    {
+        return $this->toSimplifiedVariableNamesInternal('');
+    }
+
+    private function toSimplifiedVariableNamesInternal(string $prefix): array
+    {
+        $newVariables = [];
+
+        $name = ($prefix ? $prefix . '.' : '') . $this->getName();
+        if ($name === '') {
+            return $newVariables;
+        }
+
+        $newVariables[$name] = $name;
+
+        if ($this->getType() === PlainVariablesTypeMap::TYPE_ARRAY) {
+            foreach ($this->getItems() as $item) {
+                $newVariables = $newVariables + $item->toSimplifiedVariableNamesInternal($name);
+            }
+        }
+
+        return $newVariables;
+    }
 }
