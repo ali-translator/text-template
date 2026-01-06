@@ -3,8 +3,8 @@
 namespace ALI\TextTemplate\Tests\TemplateResolver\Template;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
-use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
+use ALI\TextTemplate\TemplateResolver\TextTemplateMessageResolver;
 use ALI\TextTemplate\TextTemplateFactory;
 use ALI\TextTemplate\TextTemplateItem;
 use PHPUnit\Framework\TestCase;
@@ -98,12 +98,19 @@ class TextTemplateMessageResolverTest extends TestCase
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
 
-        $content = 'Розваги {some_undefined_function("123",test_variable)} {print(city_name)|makeFirstCharacterInLowercase()} {test_variable_1}';
-        $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content);
+        $content = '{% if is_active == true %}Розваги {some_undefined_function("123",test_variable)} {print(city_name)|makeFirstCharacterInLowercase()} {test_variable_1}{% else %}{city_name}{% endif %} {% for user in users %}{user.name}{% endfor %}';
+        $allUsedPlainVariables = $templateMessageResolver->getAllUsedPlainVariables($content)->toArray();
         $this->assertEquals([
-            "test_variable" => "test_variable",
-            "city_name" => "city_name",
-            "test_variable_1" => "test_variable_1"
+            "test_variable" => "string",
+            "city_name" => "string",
+            "test_variable_1" => "string",
+            "is_active" => "boolean",
+            "users" => [
+                "type" => "array",
+                "items" => [
+                    "name" => "string",
+                ],
+            ],
         ], $allUsedPlainVariables);
     }
 

@@ -3,6 +3,9 @@
 namespace ALI\TextTemplate\TemplateResolver;
 
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
+use ALI\TextTemplate\TemplateResolver\Node\ConditionEvaluator;
+use ALI\TextTemplate\TemplateResolver\Node\NodeParser;
+use ALI\TextTemplate\TemplateResolver\Node\TextNodeMessageResolver;
 use ALI\TextTemplate\TemplateResolver\Plain\PlainTextMessageResolver;
 use ALI\TextTemplate\TemplateResolver\Plural\PluralTemplateMessageResolver;
 use ALI\TextTemplate\TemplateResolver\Template\KeyGenerators\KeyGenerator;
@@ -12,7 +15,6 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\DefaultHa
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepository;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersRepositoryInterface;
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
-use ALI\TextTemplate\TemplateResolver\Template\TextTemplateMessageResolver;
 use RuntimeException;
 
 class TemplateMessageResolverFactory
@@ -87,6 +89,16 @@ class TemplateMessageResolverFactory
                 break;
             case MessageFormatsEnum::PLAIN_TEXT:
                 $templateMessageResolver = new PlainTextMessageResolver();
+                break;
+            case MessageFormatsEnum::TEXT_NODE:
+                /** @var TextTemplateMessageResolver $textTemplateResolver */
+                $textTemplateResolver = $this->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);
+                $templateMessageResolver = new TextNodeMessageResolver(
+                    $textTemplateResolver,
+                    new NodeParser($this->keyGenerator),
+                    new ConditionEvaluator(),
+                    $this->silentMode
+                );
                 break;
             default:
                 throw new RuntimeException('Undefined message format "' . $messageFormat . '"');
