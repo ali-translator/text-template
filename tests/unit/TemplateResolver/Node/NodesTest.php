@@ -38,7 +38,7 @@ class NodesTest extends TestCase
     {
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
 
-        $content = '{% if product_stock > 10 %}Available{% elseif product_stock > 0 %}Only {product_stock} left!{% else %}Sold-out!{% endif %}';
+        $content = '{% if product_stock &gt; 10 %}Available{% elseif product_stock &gt; 0 %}Only {product_stock} left!{% else %}Sold-out!{% endif %}';
 
         $textTemplate = $textTemplateFactory->create($content, [
             'product_stock' => 11,

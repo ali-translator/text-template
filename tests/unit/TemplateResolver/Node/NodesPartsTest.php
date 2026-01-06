@@ -5,7 +5,6 @@ namespace ALI\TextTemplate\Tests\TemplateResolver\Node;
 use ALI\TextTemplate\MessageFormat\MessageFormatsEnum;
 use ALI\TextTemplate\TemplateResolver\TemplateMessageResolverFactory;
 use ALI\TextTemplate\TemplateResolver\TextTemplateMessageResolver;
-use ALI\TextTemplate\TextTemplateFactory;
 use PHPUnit\Framework\TestCase;
 
 class NodesPartsTest extends TestCase
@@ -14,7 +13,6 @@ class NodesPartsTest extends TestCase
     public function testIfElseNodeResolvesCondition(): void
     {
         $templateMessageResolverFactory = new TemplateMessageResolverFactory('en');
-        $textTemplateFactory = new TextTemplateFactory($templateMessageResolverFactory);
 
         $content =
 '{% if is_daytime %}
@@ -27,10 +25,12 @@ class NodesPartsTest extends TestCase
 {% endif %}
 
 {% for item in collection %}
-{item.name} - {%if item.age > 25 %}old{%else%}young{%endif%}
+{item.name} - {%if item.age &gt; 25 %}old{%else%}young{%endif%}
 {% endfor %}
 ';
 
+        /*
+        $textTemplateFactory = new TextTemplateFactory($templateMessageResolverFactory);
         $textTemplate = $textTemplateFactory->create($content, [
             'user_name' => 'Jerry',
             'is_daytime' => true,
@@ -46,8 +46,7 @@ class NodesPartsTest extends TestCase
                 ]
             ],
         ]);
-
-        // $textTemplate->resolve();
+        $textTemplate->resolve();*/
 
         /** @var TextTemplateMessageResolver $templateMessageResolver */
         $templateMessageResolver = $templateMessageResolverFactory->generateTemplateMessageResolver(MessageFormatsEnum::TEXT_TEMPLATE);

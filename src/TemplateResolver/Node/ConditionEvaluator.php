@@ -8,6 +8,7 @@ class ConditionEvaluator
 {
     public function evaluate(string $expression, ?TextTemplatesCollection $textTemplatesCollection): bool
     {
+        $expression = $this->normalizeExpression($expression);
         $expression = trim($expression);
         if ($expression === '') {
             return false;
@@ -37,6 +38,7 @@ class ConditionEvaluator
      */
     public function getUsedVariables(string $expression): array
     {
+        $expression = $this->normalizeExpression($expression);
         $expression = trim($expression);
         if ($expression === '') {
             return [];
@@ -73,6 +75,7 @@ class ConditionEvaluator
      */
     public function getVariablesWithTypes(string $expression): array
     {
+        $expression = $this->normalizeExpression($expression);
         $expression = trim($expression);
         if ($expression === '') {
             return [];
@@ -404,5 +407,70 @@ class ConditionEvaluator
         }
 
         return substr($value, 1, -1);
+    }
+
+    private function normalizeExpression(string $expression): string
+    {
+        if ($expression === '') {
+            return $expression;
+        }
+
+        if (strpos($expression, '&') === false) {
+            return $expression;
+        }
+
+        $hasGt = strpos($expression, '&gt;') !== false;
+        $hasLt = strpos($expression, '&lt;') !== false;
+        if (!$hasGt && !$hasLt) {
+            return $expression;
+        }
+
+        if (strpos($expression, "'") === false && strpos($expression, '"') === false) {
+            return strtr($expression, [
+                '&gt;' => '>',
+                '&lt;' => '<',
+            ]);
+        }
+
+        $length = strlen($expression);
+        $result = '';
+        $inSingle = false;
+        $inDouble = false;
+        $changed = false;
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $expression[$i];
+            if ($char === "'" && !$inDouble) {
+                $inSingle = !$inSingle;
+                $result .= $char;
+                continue;
+            }
+
+            if ($char === '"' && !$inSingle) {
+                $inDouble = !$inDouble;
+                $result .= $char;
+                continue;
+            }
+
+            if (!$inSingle && !$inDouble && $char === '&') {
+                if ($hasGt && substr($expression, $i, 4) === '&gt;') {
+                    $result .= '>';
+                    $i += 3;
+                    $changed = true;
+                    continue;
+                }
+
+                if ($hasLt && substr($expression, $i, 4) === '&lt;') {
+                    $result .= '<';
+                    $i += 3;
+                    $changed = true;
+                    continue;
+                }
+            }
+
+            $result .= $char;
+        }
+
+        return $changed ? $result : $expression;
     }
 }
