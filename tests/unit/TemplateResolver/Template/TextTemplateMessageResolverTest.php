@@ -92,6 +92,38 @@ class TextTemplateMessageResolverTest extends TestCase
         $this->assertEquals('Розваги {some_undefined_variable("123")} Києві', $textTemplate->resolve());
     }
 
+    public function testNestedAssociativeArrayVariablesAreResolvedWithoutForNode(): void
+    {
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
+
+        $parameters = [
+            'SelectedProviderService' => [
+                'unique_name_for_contract' => 'provider-contract-1',
+                'meta' => [
+                    'status' => 'active',
+                ],
+            ],
+        ];
+
+        $plainVariableTemplate = $textTemplateFactory->create(
+            '<td>{SelectedProviderService.unique_name_for_contract}</td>',
+            $parameters
+        );
+        $this->assertEquals('<td>provider-contract-1</td>', $plainVariableTemplate->resolve());
+
+        $logicVariableTemplate = $textTemplateFactory->create(
+            '{print(SelectedProviderService.meta.status)}',
+            $parameters
+        );
+        $this->assertEquals('active', $logicVariableTemplate->resolve());
+
+        $ifConditionTemplate = $textTemplateFactory->create(
+            '{% if SelectedProviderService.meta.status == "active" %}enabled{% else %}disabled{% endif %}',
+            $parameters
+        );
+        $this->assertEquals('enabled', $ifConditionTemplate->resolve());
+    }
+
     public function testGetAllUsedPlainVariables()
     {
         $templateMessageResolverFactory = new TemplateMessageResolverFactory('uk');

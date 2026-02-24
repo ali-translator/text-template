@@ -3,17 +3,24 @@
 namespace ALI\TextTemplate\TemplateResolver\Template\LogicVariables;
 
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Exceptions\HandlerArgumentUndefinedVariableExcepting;
+use ALI\TextTemplate\TemplateResolver\Template\VariableResolver\CollectionVariableResolver;
 use ALI\TextTemplate\TextTemplatesCollection;
 
 class HandlerOperationConfig
 {
     private string $handlerAlias;
     private array $rawConfig;
+    private CollectionVariableResolver $collectionVariableResolver;
 
-    public function __construct(string $handlerAlias, array $rawConfig = [])
+    public function __construct(
+        string $handlerAlias,
+        array $rawConfig = [],
+        ?CollectionVariableResolver $collectionVariableResolver = null
+    )
     {
         $this->handlerAlias = $handlerAlias;
         $this->rawConfig = $rawConfig;
+        $this->collectionVariableResolver = $collectionVariableResolver ?? new CollectionVariableResolver();
     }
 
     public function getHandlerAlias(): string
@@ -28,7 +35,7 @@ class HandlerOperationConfig
         $config = [];
         foreach ($this->rawConfig as $key => $value) {
             if (is_array($value) && $value['type'] === 'variable') {
-                $templateItem = $variablesCollection->get($value['value']);
+                $templateItem = $this->collectionVariableResolver->find($variablesCollection, $value['value']);
                 if ($templateItem) {
                     $config[$key] = $templateItem->resolve();
                 } else {

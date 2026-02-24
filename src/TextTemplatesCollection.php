@@ -46,6 +46,10 @@ class TextTemplatesCollection implements IteratorAggregate
         return $templateId;
     }
 
+    /**
+     * For more complex templateId resolution logic (e.g., accessing object elements),
+     * use “CollectionVariableResolver->find” instead of this method.
+     */
     public function get(string $templateId): ?TextTemplateItem
     {
         return $this->textTemplates[$templateId] ?? null;

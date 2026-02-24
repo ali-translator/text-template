@@ -23,6 +23,15 @@ $textTemplate = $textTemplateFactory->create('Tom has {appleNumbers} apples', [
 echo $textTemplate->resolve();
 // Result: "Tom has 5 apples"
 
+# Access nested values from associative arrays
+$textTemplate = $textTemplateFactory->create('<td>{SelectedProviderService.unique_name_for_contract}</td>', [
+    'SelectedProviderService' => [
+        'unique_name_for_contract' => 'provider-contract-1',
+    ],
+]);
+echo $textTemplate->resolve();
+// Result: "<td>provider-contract-1</td>"
+
 # For better results, you can add plural form selection
 $textTemplate = $textTemplateFactory->create('Tom has {plural(appleNumbers, "=0[no apples] =1[one apple] other[many apples]")}', [
     'appleNumbers' => 1,
@@ -90,7 +99,7 @@ Conditions support simple expressions like:
 
 ### Loop nodes
 
-Loop through arrays using `{% for item in items %}` and `{% endfor %}`. For array items, nested keys are exposed as `{item.key}`.
+Loop through arrays using `{% for item in items %}` and `{% endfor %}`. Dot-path variables (`{a.b.c}`) work both outside and inside loops.
 
 ```php
 $content = '{% for user in users %}{print(user.name)|makeFirstCharacterInUppercase()} ({user.city}) {% endfor %}';

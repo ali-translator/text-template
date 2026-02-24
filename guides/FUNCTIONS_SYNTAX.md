@@ -14,6 +14,7 @@ In our system, Functions provide a dynamic way to manipulate and format text. Th
    - **Parameters**: Parameters can be either variables or strings.
    - **Strings**: Can be enclosed in single (') or double (") quotes: ```{print('hello')}```
    - **Variables**: Are not enclosed in quotes: ```{print(city_name)}```. Here, city_name is treated as a variable.
+     Dot-path variables are also supported: ```{print(user.profile.city)}```.
 
 #### Example:
 

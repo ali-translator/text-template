@@ -15,6 +15,7 @@ use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\Handlers\HandlersR
 use ALI\TextTemplate\TemplateResolver\Template\LogicVariables\LogicVariableParser;
 use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageCollector;
 use ALI\TextTemplate\TemplateResolver\Template\PlainVariables\PlainVariablesUsageResultInterface;
+use ALI\TextTemplate\TemplateResolver\Template\VariableResolver\CollectionVariableResolver;
 use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplatesCollection;
 use Exception;
@@ -27,6 +28,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
     private ?HandlersRepositoryInterface $handlersRepository;
     private NodeParser $nodeParser;
     private ConditionEvaluator $conditionEvaluator;
+    private CollectionVariableResolver $collectionVariableResolver;
     private ?TextNodeMessageResolver $textNodeMessageResolver = null;
     private ?PlainVariablesUsageCollector $_plainVariablesUsageCollector = null;
     // "SilentMode" will catch all parser errors and not pass them to you
@@ -43,7 +45,8 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         $this->textKeysHandler = new TextKeysHandler();
         $this->handlersRepository = $logicVariableHandlersRepository;
         $this->logicVariableParser = $logicVariableParser;
-        $this->conditionEvaluator = new ConditionEvaluator();
+        $this->collectionVariableResolver = new CollectionVariableResolver();
+        $this->conditionEvaluator = new ConditionEvaluator($this->collectionVariableResolver);
         $this->nodeParser = new NodeParser($keyGenerator);
         $this->silentMode = $silentMode;
     }
@@ -97,13 +100,10 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         return $this->textKeysHandler->replaceKeys(
             $this->keyGenerator,
             $content,
-            function (string $variableContent) use (
-                $workingTextTemplatesCollection,
-                $templateItem
-            ) {
+            function (string $variableContent) use ($workingTextTemplatesCollection) {
                 // Plain template variable (including nodes)
                 $variableId = $variableContent;
-                $childValue = $workingTextTemplatesCollection->get($variableId);
+                $childValue = $this->collectionVariableResolver->find($workingTextTemplatesCollection, $variableId);
                 if ($childValue) {
                     return $childValue->resolve();
                 }
@@ -147,7 +147,7 @@ class TextTemplateMessageResolver implements TemplateMessageResolver
         }
 
         if (!isset($resolvedLogicalVariable) && !$this->silentMode) {
-            throw new VariableResolvingException($variableContent, $exception->getMessage());
+            throw new VariableResolvingException($variableContent, isset($exception) ? $exception->getMessage() : null);
         }
 
         return $resolvedLogicalVariable ?? null;

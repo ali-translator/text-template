@@ -2,10 +2,18 @@
 
 namespace ALI\TextTemplate\TemplateResolver\Node;
 
+use ALI\TextTemplate\TemplateResolver\Template\VariableResolver\CollectionVariableResolver;
 use ALI\TextTemplate\TextTemplatesCollection;
 
 class ConditionEvaluator
 {
+    private CollectionVariableResolver $collectionVariableResolver;
+
+    public function __construct(?CollectionVariableResolver $collectionVariableResolver = null)
+    {
+        $this->collectionVariableResolver = $collectionVariableResolver ?? new CollectionVariableResolver();
+    }
+
     public function evaluate(string $expression, ?TextTemplatesCollection $textTemplatesCollection): bool
     {
         $expression = $this->normalizeExpression($expression);
@@ -372,11 +380,7 @@ class ConditionEvaluator
 
     private function resolveVariableValue(string $name, ?TextTemplatesCollection $textTemplatesCollection)
     {
-        if (!$textTemplatesCollection) {
-            return null;
-        }
-
-        $templateItem = $textTemplatesCollection->get($name);
+        $templateItem = $this->collectionVariableResolver->find($textTemplatesCollection, $name);
         if (!$templateItem) {
             return null;
         }

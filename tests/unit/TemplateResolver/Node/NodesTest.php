@@ -127,6 +127,23 @@ class NodesTest extends TestCase
         $this->assertEquals('Tom (london)|Kate (rome)|', $textTemplate->resolve());
     }
 
+    public function testForNodeResolvesNestedCollectionPath(): void
+    {
+        $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));
+
+        $content = '{% for user in payload.users %}{user.name},{% endfor %}';
+        $textTemplate = $textTemplateFactory->create($content, [
+            'payload' => [
+                'users' => [
+                    ['name' => 'Tom'],
+                    ['name' => 'Kate'],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('Tom,Kate,', $textTemplate->resolve());
+    }
+
     public function testIfNodeContainsNestedIfNode(): void
     {
         $textTemplateFactory = new TextTemplateFactory(new TemplateMessageResolverFactory('en'));

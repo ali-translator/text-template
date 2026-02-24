@@ -3,6 +3,7 @@
 namespace ALI\TextTemplate\TemplateResolver\Node;
 
 use ALI\TextTemplate\TemplateResolver\TextTemplateMessageResolver;
+use ALI\TextTemplate\TemplateResolver\Template\VariableResolver\CollectionVariableResolver;
 use ALI\TextTemplate\TextTemplateItem;
 use ALI\TextTemplate\TextTemplatesCollection;
 
@@ -11,16 +12,19 @@ class NodeRuntime
     private ConditionEvaluator $conditionEvaluator;
     private TextTemplateMessageResolver $textTemplateMessageResolver;
     private ?TextTemplatesCollection $textTemplatesCollection;
+    private CollectionVariableResolver $collectionVariableResolver;
 
     public function __construct(
         ConditionEvaluator $conditionEvaluator,
         TextTemplateMessageResolver $textTemplateMessageResolver,
-        ?TextTemplatesCollection $textTemplatesCollection
+        ?TextTemplatesCollection $textTemplatesCollection,
+        ?CollectionVariableResolver $collectionVariableResolver = null
     )
     {
         $this->conditionEvaluator = $conditionEvaluator;
         $this->textTemplateMessageResolver = $textTemplateMessageResolver;
         $this->textTemplatesCollection = $textTemplatesCollection;
+        $this->collectionVariableResolver = $collectionVariableResolver ?? new CollectionVariableResolver();
     }
 
     public function evaluateCondition(string $expression): bool
@@ -41,11 +45,7 @@ class NodeRuntime
 
     public function getIterable(string $collectionName): ?iterable
     {
-        if (!$this->textTemplatesCollection) {
-            return null;
-        }
-
-        $templateItem = $this->textTemplatesCollection->get($collectionName);
+        $templateItem = $this->collectionVariableResolver->find($this->textTemplatesCollection, $collectionName);
         if (!$templateItem) {
             return null;
         }
@@ -81,27 +81,6 @@ class NodeRuntime
 
     private function addValueToCollection(TextTemplatesCollection $collection, string $name, $value): void
     {
-        if ($collection->get($name)) {
-            $collection->remove($name);
-        }
-
-        if ($value instanceof TextTemplateItem) {
-            $collection->add($value, $name);
-            return;
-        }
-
-        $stringValue = '';
-        if (is_scalar($value)) {
-            $stringValue = (string)$value;
-        } elseif (is_object($value) && method_exists($value, '__toString')) {
-            $stringValue = (string)$value;
-        }
-
-        $textTemplateItem = new TextTemplateItem($stringValue);
-        if (is_array($value) || is_object($value)) {
-            $textTemplateItem->setRawValue($value);
-        }
-
-        $collection->add($textTemplateItem, $name);
+        $this->collectionVariableResolver->addOrReplace($collection, $name, $value);
     }
 }
