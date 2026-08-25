@@ -10,7 +10,7 @@ class HandlerArgumentUndefinedVariableExcepting extends RuntimeException
     protected string $undefinedVariableName;
     protected int $argumentNumber;
 
-    public function __construct(string $undefinedVariableName, int $argumentNumber, Throwable $previous = null)
+    public function __construct(string $undefinedVariableName, int $argumentNumber, ?Throwable $previous = null)
     {
         $this->undefinedVariableName = $undefinedVariableName;
         $this->argumentNumber = $argumentNumber;

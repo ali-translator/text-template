@@ -12,7 +12,7 @@ class VariableResolvingException extends RuntimeException
     public function __construct(
         string    $variableContent,
                   $message,
-        Throwable $previous = null
+        ?Throwable $previous = null
     )
     {
         $this->variableContent = $variableContent;
